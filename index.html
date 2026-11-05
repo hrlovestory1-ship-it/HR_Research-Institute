@@ -328,12 +328,75 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
 </section>
 
 <!-- MY PAGE -->
+
 <section class="page" id="page-mypage">
- <div class="section-head"><div><div class="section-no">11 / MY PAGE</div><h2>연구원 마이페이지</h2><p>RESEARCHER PROFILE & ACCOUNT</p></div></div>
- <div class="preview-warning">계정 정보는 실제 로그인 후 본인에게만 표시됩니다. 아래는 화면 확인용 예시 프로필입니다.</div>
- <div class="profile-grid"><article class="profile-card"><h3>RESEARCHER PROFILE</h3><p>연구원 번호 : HR-001</p><p>계정 등급 : SUPER ADMIN (예시)</p><p>가입일 : 2026-11-01</p><p>계정 상태 : ACTIVE</p></article><article class="profile-card"><h3>MY ACTIVITY</h3><p>작성한 게시글 : 00</p><p>작성한 댓글 : 00</p><p>등록한 관찰일지 : 00</p><p>최근 접속 : 미리보기</p></article></div>
- <button class="dark-action" style="max-width:240px;margin-top:14px" onclick="openLogin()">연구원 계정 로그인 →</button>
+  <div class="section-head">
+    <div>
+      <div class="section-no">11 / MY PAGE</div>
+      <h2>연구원 마이페이지</h2>
+      <p>RESEARCHER PROFILE & ACCOUNT</p>
+    </div>
+  </div>
+
+  <div id="myPageLoginNotice" class="preview-warning">
+    연구원 인증 후 개인 정보를 확인할 수 있습니다.
+  </div>
+
+  <div class="profile-grid">
+    <article class="profile-card">
+      <h3>RESEARCHER PROFILE</h3>
+      <p>연구원 번호 : <span id="myResearcherNumber">-</span></p>
+      <p>닉네임 : <span id="myResearcherName">미등록</span></p>
+      <p>계정 등급 : <span id="myResearcherRole">-</span></p>
+      <p>계정 상태 : <span id="myResearcherStatus">-</span></p>
+    </article>
+
+    <article class="profile-card">
+      <h3>MY ACTIVITY</h3>
+      <p>작성한 게시글 : 00</p>
+      <p>작성한 댓글 : 00</p>
+      <p>등록한 관찰일지 : 00</p>
+      <p>최근 접속 : 준비 중</p>
+    </article>
+  </div>
+
+  <div id="adminResearcherPanel" style="display:none;margin-top:30px;">
+    <div class="section-head">
+      <div>
+        <div class="section-no">ADMINISTRATION</div>
+        <h2>연구원 계정 관리</h2>
+        <p>RESEARCHER ACCOUNT MANAGEMENT</p>
+      </div>
+    </div>
+
+    <article class="profile-card">
+      <h3>NEW RESEARCHER REGISTRATION</h3>
+      <p>관리자 전용 연구원 계정 발급 시스템입니다.</p>
+
+      <label>RESEARCHER NUMBER</label>
+      <input id="newResearcherNumber" type="text" placeholder="예: HR-111">
+
+      <label>LOGIN ID</label>
+      <input id="newResearcherLoginId" type="text" placeholder="로그인 ID">
+
+      <label>TEMPORARY PASSWORD</label>
+      <input id="newResearcherPassword" type="password" placeholder="8자 이상">
+
+      <button class="dark-action" onclick="createResearcherAccount()">
+        연구원 계정 발급 →
+      </button>
+
+      <p id="researcherCreateMessage"></p>
+    </article>
+  </div>
+
+  <button class="dark-action"
+    style="max-width:240px;margin-top:20px"
+    onclick="openLogin()">
+    연구원 계정 로그인 →
+  </button>
 </section>
+
 
 <!-- LOCATION -->
 <section class="page" id="page-location">
