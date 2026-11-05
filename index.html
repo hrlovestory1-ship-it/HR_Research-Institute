@@ -388,8 +388,24 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
         <h3>RESEARCHER PROFILE</h3>
         <p>연구원 번호 : <span id="myResearcherNumber">-</span></p>
         <p>닉네임 : <span id="myResearcherName">미등록</span></p>
-        <p>계정 등급 : <span id="myResearcherRole">-</span></p>
-        <p>계정 상태 : <span id="myResearcherStatus">-</span></p>
+
+<div class="nickname-edit">
+  <label for="nicknameInput">NICKNAME</label>
+  <input
+    type="text"
+    id="nicknameInput"
+    placeholder="사용할 닉네임을 입력해 주세요."
+    minlength="2"
+    maxlength="20"
+  >
+  <button type="button" onclick="changeResearcherNickname()">
+    닉네임 변경
+  </button>
+  <p id="nicknameMessage"></p>
+</div>
+
+<p>계정 등급 : <span id="myResearcherRole">-</span></p>
+<p>계정 상태 : <span id="myResearcherStatus">-</span></p>
       </article>
 
       <article class="profile-card">
@@ -634,6 +650,7 @@ async function logoutResearcher() {
 }
 
 // 마이페이지 정보 표시
+// 마이페이지 정보 표시
 function updateMyPage(researcher) {
   const number = document.getElementById("myResearcherNumber");
   const name = document.getElementById("myResearcherName");
@@ -645,12 +662,18 @@ function updateMyPage(researcher) {
   const passwordPanel = document.getElementById("passwordChangePanel");
   const normalContent = document.getElementById("myPageNormalContent");
 
+  const nicknameInput = document.getElementById("nicknameInput");
+
   if (number) {
     number.textContent = researcher.researcher_number;
   }
 
   if (name) {
     name.textContent = researcher.researcher_name || "미등록";
+  }
+
+  if (nicknameInput) {
+    nicknameInput.value = researcher.researcher_name || "";
   }
 
   if (role) {
@@ -665,7 +688,6 @@ function updateMyPage(researcher) {
     notice.style.display = "none";
   }
 
-  // 최초 로그인 연구원은 비밀번호 변경 화면 표시
   const mustChangePassword =
     researcher.must_change_password === true;
 
@@ -679,7 +701,6 @@ function updateMyPage(researcher) {
       mustChangePassword ? "none" : "block";
   }
 
-  // 관리자 권한이 있는 연구원만 계정 관리 영역 표시
   if (adminPanel) {
     const isAdmin =
       ["SUPER_ADMIN", "ADMIN"].includes(researcher.role);
@@ -688,7 +709,6 @@ function updateMyPage(researcher) {
       (!mustChangePassword && isAdmin) ? "block" : "none";
   }
 }
-
 
 // 로그인 상태 복원
 async function restoreResearcherAccess() {
@@ -876,7 +896,59 @@ async function changeResearcherPassword() {
   }
 }
 
+// 연구원 닉네임 변경
+async function changeResearcherNickname() {
+  const nicknameInput = document.getElementById("nicknameInput");
+  const message = document.getElementById("nicknameMessage");
 
+  const nickname = nicknameInput.value.trim();
+
+  if (nickname.length < 2 || nickname.length > 20) {
+    message.textContent = "닉네임은 2~20자로 입력해 주세요.";
+    return;
+  }
+
+  if (!/^[가-힣a-zA-Z0-9 ]+$/.test(nickname)) {
+    message.textContent =
+      "닉네임은 한글, 영문, 숫자, 공백만 사용할 수 있습니다.";
+    return;
+  }
+
+  try {
+    const { data: { user }, error: userError } =
+      await window.gomgaeSupabase.auth.getUser();
+
+    if (userError || !user) {
+      message.textContent = "로그인 후 이용해 주세요.";
+      return;
+    }
+
+    message.textContent = "닉네임을 저장하고 있습니다...";
+
+    const { error } = await window.gomgaeSupabase
+      .from("researchers")
+      .update({ researcher_name: nickname })
+      .eq("auth_user_id", user.id);
+
+    if (error) {
+      console.error("Nickname update error:", error);
+      message.textContent = "닉네임 저장에 실패했습니다.";
+      return;
+    }
+
+    const researcher = await loadResearcherProfile();
+
+    updateMyPage(researcher);
+
+    message.textContent = "닉네임이 성공적으로 변경되었습니다!";
+
+  } catch (error) {
+    console.error("Nickname change error:", error);
+    message.textContent =
+      "서버 연결에 실패했습니다. 다시 시도해 주세요.";
+  }
+}
+ 
 // 신규 연구원 계정 발급
 async function createResearcherAccount() {
   const researcherNumber = document
