@@ -329,6 +329,7 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
 
 <!-- MY PAGE -->
 
+
 <section class="page" id="page-mypage">
   <div class="section-head">
     <div>
@@ -342,59 +343,111 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
     연구원 인증 후 개인 정보를 확인할 수 있습니다.
   </div>
 
-  <div class="profile-grid">
-    <article class="profile-card">
-      <h3>RESEARCHER PROFILE</h3>
-      <p>연구원 번호 : <span id="myResearcherNumber">-</span></p>
-      <p>닉네임 : <span id="myResearcherName">미등록</span></p>
-      <p>계정 등급 : <span id="myResearcherRole">-</span></p>
-      <p>계정 상태 : <span id="myResearcherStatus">-</span></p>
-    </article>
+  <!-- 최초 로그인 비밀번호 변경 영역 -->
+  <div id="passwordChangePanel"
+       class="profile-card"
+       style="display:none;margin-top:20px;">
 
-    <article class="profile-card">
-      <h3>MY ACTIVITY</h3>
-      <p>작성한 게시글 : 00</p>
-      <p>작성한 댓글 : 00</p>
-      <p>등록한 관찰일지 : 00</p>
-      <p>최근 접속 : 준비 중</p>
-    </article>
+    <div class="eyebrow">INITIAL PASSWORD SETUP</div>
+    <h3>비밀번호 변경</h3>
+
+    <p>
+      연구소 보안 정책에 따라 최초 로그인 시
+      임시 비밀번호를 새로운 비밀번호로 변경해야 합니다.
+    </p>
+
+    <label>NEW PASSWORD</label>
+    <input
+      id="newPasswordInput"
+      type="password"
+      placeholder="새 비밀번호 8자 이상"
+      autocomplete="new-password"
+    >
+
+    <label>CONFIRM NEW PASSWORD</label>
+    <input
+      id="confirmPasswordInput"
+      type="password"
+      placeholder="새 비밀번호 다시 입력"
+      autocomplete="new-password"
+    >
+
+    <button class="dark-action"
+            onclick="changeResearcherPassword()">
+      비밀번호 변경 →
+    </button>
+
+    <p id="passwordChangeMessage"></p>
   </div>
 
-  <div id="adminResearcherPanel" style="display:none;margin-top:30px;">
-    <div class="section-head">
-      <div>
-        <div class="section-no">ADMINISTRATION</div>
-        <h2>연구원 계정 관리</h2>
-        <p>RESEARCHER ACCOUNT MANAGEMENT</p>
-      </div>
+  <!-- 일반 마이페이지 영역 -->
+  <div id="myPageNormalContent">
+
+    <div class="profile-grid">
+      <article class="profile-card">
+        <h3>RESEARCHER PROFILE</h3>
+        <p>연구원 번호 : <span id="myResearcherNumber">-</span></p>
+        <p>닉네임 : <span id="myResearcherName">미등록</span></p>
+        <p>계정 등급 : <span id="myResearcherRole">-</span></p>
+        <p>계정 상태 : <span id="myResearcherStatus">-</span></p>
+      </article>
+
+      <article class="profile-card">
+        <h3>MY ACTIVITY</h3>
+        <p>작성한 게시글 : 00</p>
+        <p>작성한 댓글 : 00</p>
+        <p>등록한 관찰일지 : 00</p>
+        <p>최근 접속 : 준비 중</p>
+      </article>
     </div>
 
-    <article class="profile-card">
-      <h3>NEW RESEARCHER REGISTRATION</h3>
-      <p>관리자 전용 연구원 계정 발급 시스템입니다.</p>
+    <!-- 관리자 전용 계정 관리 -->
+    <div id="adminResearcherPanel"
+         style="display:none;margin-top:30px;">
 
-      <label>RESEARCHER NUMBER</label>
-      <input id="newResearcherNumber" type="text" placeholder="예: HR-111">
+      <div class="section-head">
+        <div>
+          <div class="section-no">ADMINISTRATION</div>
+          <h2>연구원 계정 관리</h2>
+          <p>RESEARCHER ACCOUNT MANAGEMENT</p>
+        </div>
+      </div>
 
-      <label>LOGIN ID</label>
-      <input id="newResearcherLoginId" type="text" placeholder="로그인 ID">
+      <article class="profile-card">
+        <h3>NEW RESEARCHER REGISTRATION</h3>
+        <p>관리자 전용 연구원 계정 발급 시스템입니다.</p>
 
-      <label>TEMPORARY PASSWORD</label>
-      <input id="newResearcherPassword" type="password" placeholder="8자 이상">
+        <label>RESEARCHER NUMBER</label>
+        <input id="newResearcherNumber"
+               type="text"
+               placeholder="예: HR-111">
 
-      <button class="dark-action" onclick="createResearcherAccount()">
-        연구원 계정 발급 →
-      </button>
+        <label>LOGIN ID</label>
+        <input id="newResearcherLoginId"
+               type="text"
+               placeholder="로그인 ID">
 
-      <p id="researcherCreateMessage"></p>
-    </article>
+        <label>TEMPORARY PASSWORD</label>
+        <input id="newResearcherPassword"
+               type="password"
+               placeholder="8자 이상">
+
+        <button class="dark-action"
+                onclick="createResearcherAccount()">
+          연구원 계정 발급 →
+        </button>
+
+        <p id="researcherCreateMessage"></p>
+      </article>
+    </div>
+
+    <button class="dark-action"
+            style="max-width:240px;margin-top:20px"
+            onclick="openLogin()">
+      연구원 계정 로그인 →
+    </button>
+
   </div>
-
-  <button class="dark-action"
-    style="max-width:240px;margin-top:20px"
-    onclick="openLogin()">
-    연구원 계정 로그인 →
-  </button>
 </section>
 
 
