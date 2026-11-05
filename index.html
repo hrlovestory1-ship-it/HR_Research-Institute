@@ -376,5 +376,11 @@ function selectCategory(button,category){
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLogin()});
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+ <script>
+window.gomgaeSupabase = window.supabase.createClient(
+  "https://osrgbgtbzlesngivtapr.supabase.co/rest/v1/",
+  "sb_publishable_m35n-HNZFCc9jzcTyg4szA_aRQv3XxN"
+);
+</script>
 </body>
 </html>
