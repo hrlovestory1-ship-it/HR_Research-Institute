@@ -466,13 +466,9 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
 </div>
 <script>
 
+// 페이지 전환
 function showPage(id, btn) {
-  // 로그인 세션 확인
-  const isLoggedIn =
-    window.gomgaeSupabase &&
-    window.gomgaeSupabase.auth;
-
-  // 로그인한 연구원의 최초 비밀번호 변경 여부 확인
+  // 최초 비밀번호 변경 여부 확인
   const passwordPanel =
     document.getElementById("passwordChangePanel");
 
@@ -480,7 +476,7 @@ function showPage(id, btn) {
     passwordPanel &&
     passwordPanel.style.display === "block";
 
-  // 비밀번호를 변경하지 않은 연구원은 MY PAGE만 이용 가능
+  // 최초 비밀번호를 변경하기 전에는 MY PAGE만 이용 가능
   if (mustChangePassword && id !== "mypage") {
     alert("최초 비밀번호 변경 후 이용할 수 있습니다.");
     id = "mypage";
@@ -518,6 +514,42 @@ function showPage(id, btn) {
   });
 }
 
+// 메뉴 열기 / 닫기
+function toggleMenu() {
+  document.getElementById("sidebar").classList.toggle("open");
+}
+
+// 로그인 창 열기
+function openLogin() {
+  document.getElementById("loginModal").classList.add("open");
+}
+
+// 로그인 창 닫기
+function closeLogin() {
+  document.getElementById("loginModal").classList.remove("open");
+}
+
+// 페이지 내부 탭 전환
+function switchTab(button, id) {
+  const parent = button.closest(".page");
+
+  parent.querySelectorAll(".page-toolbar button")
+    .forEach(b => b.classList.remove("active"));
+
+  parent.querySelectorAll(".tab-content")
+    .forEach(p => p.classList.remove("active"));
+
+  button.classList.add("active");
+
+  document.getElementById(id).classList.add("active");
+}
+
+// ESC 키를 누르면 로그인 창 닫기
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") {
+    closeLogin();
+  }
+});
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
