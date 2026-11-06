@@ -1110,6 +1110,155 @@ async function createResearcherAccount() {
 }
 
 
+// 방명록 불러오기
+async function loadVisitorLogs() {
+  const list = document.getElementById("visitorLogList");
+  const writePanel = document.getElementById("visitorLogWritePanel");
+  const loginNotice = document.getElementById("visitorLogLoginNotice");
+
+  if (!list) return;
+
+  list.textContent = "기록을 불러오는 중입니다.";
+
+  try {
+    const { data: { user }, error: userError } =
+      await window.gomgaeSupabase.auth.getUser();
+
+    if (userError) throw userError;
+
+    if (!user) {
+      if (writePanel) writePanel.style.display = "none";
+      if (loginNotice) loginNotice.style.display = "block";
+      list.textContent = "연구원 로그인 후 기록을 확인할 수 있습니다.";
+      return;
+    }
+
+    const { data: researcher, error: researcherError } =
+      await window.gomgaeSupabase
+        .from("researchers")
+        .select("researcher_number, is_active")
+        .eq("auth_user_id", user.id)
+        .maybeSingle();
+
+    if (researcherError) throw researcherError;
+
+    if (!researcher || !researcher.is_active) {
+      throw new Error("활성화된 연구원 정보를 확인할 수 없습니다.");
+    }
+
+    if (writePanel) writePanel.style.display = "block";
+    if (loginNotice) loginNotice.style.display = "none";
+
+    const { data: logs, error } =
+      await window.gomgaeSupabase
+        .from("visitor_logs")
+        .select("id, created_at, researcher_number, message")
+        .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    list.replaceChildren();
+
+    if (!logs || logs.length === 0) {
+      list.textContent = "아직 등록된 연구 기록이 없습니다.";
+      return;
+    }
+
+    logs.forEach(log => {
+      const card = document.createElement("article");
+      card.className = "profile-card";
+      card.style.marginBottom = "16px";
+
+      const header = document.createElement("div");
+      header.style.display = "flex";
+      header.style.justifyContent = "space-between";
+      header.style.flexWrap = "wrap";
+      header.style.gap = "8px";
+
+      const number = document.createElement("strong");
+      number.textContent = log.researcher_number;
+
+      const date = document.createElement("small");
+      date.textContent = new Date(log.created_at).toLocaleString("ko-KR");
+
+      const message = document.createElement("p");
+      message.style.whiteSpace = "pre-wrap";
+      message.style.marginTop = "16px";
+      message.textContent = log.message;
+
+      header.append(number, date);
+      card.append(header, message);
+      list.appendChild(card);
+    });
+
+  } catch (error) {
+    console.error("Visitor log loading error:", error);
+    list.textContent = "기록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.";
+  }
+}
+
+
+// 방명록 등록하기
+async function submitVisitorLog() {
+  const input = document.getElementById("visitorLogMessage");
+  const status = document.getElementById("visitorLogMessageStatus");
+
+  const message = input.value.trim();
+
+  if (!message) {
+    status.textContent = "메시지를 입력해 주세요.";
+    return;
+  }
+
+  if (message.length > 500) {
+    status.textContent = "메시지는 500자 이내로 작성해 주세요.";
+    return;
+  }
+
+  try {
+    status.textContent = "기록을 등록하고 있습니다.";
+
+    const { data: { user }, error: userError } =
+      await window.gomgaeSupabase.auth.getUser();
+
+    if (userError || !user) {
+      status.textContent = "로그인 후 이용해 주세요.";
+      return;
+    }
+
+    const { data: researcher, error: researcherError } =
+      await window.gomgaeSupabase
+        .from("researchers")
+        .select("researcher_number, is_active")
+        .eq("auth_user_id", user.id)
+        .maybeSingle();
+
+    if (researcherError) throw researcherError;
+
+    if (!researcher || !researcher.is_active) {
+      throw new Error("활성화된 연구원 정보를 확인할 수 없습니다.");
+    }
+
+    const { error } = await window.gomgaeSupabase
+      .from("visitor_logs")
+      .insert({
+        researcher_number: researcher.researcher_number,
+        message: message
+      });
+
+    if (error) throw error;
+
+    input.value = "";
+    status.textContent = "연구 기록이 등록되었습니다!";
+
+    await loadVisitorLogs();
+
+  } catch (error) {
+    console.error("Visitor log submit error:", error);
+    status.textContent = "기록 등록에 실패했습니다. 다시 시도해 주세요.";
+  }
+}
+
 // 페이지 로딩 시 로그인 상태 복원
 restoreResearcherAccess();
 
