@@ -572,6 +572,11 @@ function showPage(id, btn) {
     page.classList.add("active");
   }
 
+ // VISITOR LOG 페이지를 열면 기록 불러오기
+if (id === "visitorlog") {
+  loadVisitorLogs();
+}
+
   document.querySelectorAll(".nav button").forEach(b => {
     b.classList.remove("active");
   });
