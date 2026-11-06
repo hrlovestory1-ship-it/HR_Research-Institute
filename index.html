@@ -1369,7 +1369,113 @@ async function submitCommunityPost() {
     status.textContent = "게시글 등록에 실패했습니다.";
   }
 }
+// COMMUNITY 댓글 등록
+async function submitCommunityComment(postId, input) {
+  const content = input.value.trim();
 
+  if (!content) {
+    alert("댓글 내용을 입력해 주세요.");
+    return;
+  }
+
+  try {
+    const { data: { user }, error: userError } =
+      await window.gomgaeSupabase.auth.getUser();
+
+    if (userError) throw userError;
+
+    if (!user) {
+      alert("로그인 후 이용해 주세요.");
+      return;
+    }
+
+    const { data: researcher, error: researcherError } =
+      await window.gomgaeSupabase
+        .from("researchers")
+        .select("researcher_number, is_active")
+        .eq("auth_user_id", user.id)
+        .maybeSingle();
+
+    if (researcherError) throw researcherError;
+
+    if (!researcher || !researcher.is_active) {
+      throw new Error("활성화된 연구원 정보를 확인할 수 없습니다.");
+    }
+
+    const { error } = await window.gomgaeSupabase
+      .from("community_comments")
+      .insert({
+        post_id: postId,
+        researcher_number: researcher.researcher_number,
+        content: content
+      });
+
+    if (error) throw error;
+
+    input.value = "";
+
+    const commentList = input.parentElement.querySelector(
+      ".community-comment-list"
+    );
+
+    await loadCommunityComments(postId, commentList);
+
+  } catch (error) {
+    console.error("Community comment error:", error);
+    alert("댓글 등록에 실패했습니다.");
+  }
+}
+ 
+// COMMUNITY 댓글 목록 불러오기
+async function loadCommunityComments(postId, list) {
+  try {
+    const { data: comments, error } =
+      await window.gomgaeSupabase
+        .from("community_comments")
+        .select("id, created_at, researcher_number, content, parent_comment_id")
+        .eq("post_id", postId)
+        .order("created_at", { ascending: true });
+
+    if (error) throw error;
+
+    list.replaceChildren();
+
+    if (!comments || comments.length === 0) {
+      list.textContent = "아직 댓글이 없습니다.";
+      return;
+    }
+
+    comments
+      .filter(comment => comment.parent_comment_id === null)
+      .forEach(comment => {
+        const item = document.createElement("div");
+        item.style.marginTop = "12px";
+        item.style.padding = "12px";
+        item.style.background = "#f5f1e9";
+        item.style.borderRadius = "8px";
+
+        const author = document.createElement("strong");
+        author.textContent = comment.researcher_number;
+
+        const date = document.createElement("small");
+        date.textContent =
+          " · " + new Date(comment.created_at).toLocaleString("ko-KR");
+
+        const content = document.createElement("p");
+        content.textContent = comment.content;
+        content.style.whiteSpace = "pre-wrap";
+        content.style.marginTop = "8px";
+
+        item.append(author, date, content);
+        list.appendChild(item);
+      });
+
+  } catch (error) {
+    console.error("Community comment loading error:", error);
+    list.textContent = "댓글을 불러오지 못했습니다.";
+  }
+}
+ 
 // COMMUNITY 카테고리 필터
 // COMMUNITY 카테고리 연동
 function selectCategory(button, category) {
@@ -1461,7 +1567,47 @@ category.textContent = post.category;
       content.style.whiteSpace = "pre-wrap";
       content.style.marginTop = "10px";
 
-      card.append(category, author, date, title, content);
+      // 댓글 영역
+const commentSection = document.createElement("section");
+commentSection.className = "community-comments";
+commentSection.style.marginTop = "20px";
+
+const commentHeading = document.createElement("h4");
+commentHeading.textContent = "COMMENTS";
+
+const commentList = document.createElement("div");
+commentList.className = "community-comment-list";
+
+const commentInput = document.createElement("textarea");
+commentInput.placeholder = "댓글을 입력하세요.";
+commentInput.rows = 3;
+
+const commentButton = document.createElement("button");
+commentButton.className = "dark-action";
+commentButton.textContent = "댓글 등록";
+
+commentButton.addEventListener("click", () => {
+  submitCommunityComment(post.id, commentInput);
+});
+
+commentSection.append(
+  commentHeading,
+  commentList,
+  commentInput,
+  commentButton
+);
+
+card.append(
+  category,
+  author,
+  date,
+  title,
+  content,
+  commentSection
+);
+
+// 기존 댓글 불러오기
+loadCommunityComments(post.id, commentList);
       list.appendChild(card);
     });
 
