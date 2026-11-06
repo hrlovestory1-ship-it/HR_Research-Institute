@@ -1172,18 +1172,18 @@ async function loadVisitorLogs() {
 
     if (userError) throw userError;
 // 현재 연구원의 운영자 권한 확인
-const { data: currentResearcher, error: researcherError } =
+const { data: operatorResearcher, error: operatorLookupError } =
   await window.gomgaeSupabase
     .from("researchers")
     .select("researcher_number, is_operator, is_active")
     .eq("auth_user_id", user.id)
     .maybeSingle();
 
-if (researcherError) throw researcherError;
+if (operatorLookupError) throw operatorLookupError;
 
 const isOperator =
-  currentResearcher?.is_operator === true &&
-  currentResearcher?.is_active === true;
+  operatorResearcher?.is_operator === true &&
+  operatorResearcher?.is_active === true;
    
     if (!user) {
       if (writePanel) writePanel.style.display = "none";
