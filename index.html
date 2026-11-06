@@ -1558,7 +1558,7 @@ if (
   replyEditButton.className = "dark-action";
 
   replyEditButton.addEventListener("click", () => {
-    editCommunityComment(reply.id);
+editCommunityComment(reply.id, reply.content);
   });
 
   const replyDeleteButton = document.createElement("button");
@@ -1602,7 +1602,7 @@ if (
   editButton.className = "dark-action";
 
   editButton.addEventListener("click", () => {
-    editCommunityComment(comment.id);
+editCommunityComment(comment.id, comment.content);
   });
 
   const deleteButton = document.createElement("button");
@@ -1628,9 +1628,11 @@ list.appendChild(item);
 }
 
  // COMMUNITY 댓글 수정
-async function editCommunityComment(commentId) {
-  const newContent = prompt("수정할 댓글 내용을 입력해 주세요.");
-
+async function editCommunityComment(commentId, oldContent) {
+  const newContent = prompt(
+    "댓글 내용을 수정해 주세요.",
+    oldContent
+  );
   if (newContent === null) return;
 
   if (!newContent.trim()) {
