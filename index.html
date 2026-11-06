@@ -325,7 +325,17 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
 <section class="page" id="page-community">
  <div class="section-head"><div><div class="section-no">09 / RESEARCHER COMMUNITY</div><h2>연구원 커뮤니티</h2><p>DISCUSSION · INFORMATION · NOTICE</p></div></div>
  <div class="preview-warning">연구원 전용 게시판 디자인 미리보기입니다. 실제 글쓰기·댓글·수정·삭제 및 권한 관리는 로그인과 데이터베이스 연결 후 작동합니다.</div>
- <div class="community-layout"><div class="category-list"><button class="active" onclick="selectCategory(this,'all')">전체 게시글</button><button onclick="selectCategory(this,'공지사항')">공지사항</button><button onclick="selectCategory(this,'자유 연구실')">자유 연구실</button><button onclick="selectCategory(this,'연구 토론실')">연구 토론실</button><button onclick="selectCategory(this,'자료 제보실')">자료 제보실</button></div>
+ <div class="community-search" style="margin: 16px 0;">
+  <input
+    type="search"
+    id="communitySearchInput"
+    placeholder="게시글 제목이나 내용을 검색하세요."
+    aria-label="게시글 검색"
+    style="width: 100%; box-sizing: border-box;"
+  >
+</div>
+
+<div class="community-layout"><div class="category-list"><button class="active" onclick="selectCategory(this,'all')">전체 게시글</button><button onclick="selectCategory(this,'공지사항')">공지사항</button><button onclick="selectCategory(this,'자유 연구실')">자유 연구실</button><button onclick="selectCategory(this,'연구 토론실')">연구 토론실</button><button onclick="selectCategory(this,'자료 제보실')">자료 제보실</button></div>
  <div class="post-list" id="communityPostList">
   <p>게시글을 불러오는 중입니다.</p>
 </div>
@@ -1854,11 +1864,50 @@ async function deleteCommunityComment(commentId) {
  
 // COMMUNITY 카테고리 필터
 // COMMUNITY 카테고리 연동
+// 현재 선택된 카테고리
+let currentCommunityCategory = "all";
+
+// 검색어와 카테고리를 함께 적용
+function filterCommunityPosts() {
+  const searchInput =
+    document.getElementById("communitySearchInput");
+
+  const keyword = searchInput
+    ? searchInput.value.trim().toLowerCase()
+    : "";
+
+  const posts = document.querySelectorAll(
+    "#communityPostList article"
+  );
+
+  posts.forEach(post => {
+    const categoryMatches =
+      currentCommunityCategory === "all" ||
+      post.dataset.category === currentCommunityCategory;
+
+    const title =
+      post.querySelector("h3")?.textContent || "";
+
+    const content =
+      post.querySelector("p")?.textContent || "";
+
+    const searchMatches =
+      !keyword ||
+      `${title} ${content}`.toLowerCase().includes(keyword);
+
+    post.style.display =
+      categoryMatches && searchMatches ? "" : "none";
+  });
+}
+
+// 카테고리 선택
 function selectCategory(button, category) {
   document.querySelectorAll(".category-list button")
     .forEach(btn => btn.classList.remove("active"));
 
   button.classList.add("active");
+
+  currentCommunityCategory = category;
 
   const categorySelect =
     document.getElementById("communityPostCategory");
@@ -1867,16 +1916,7 @@ function selectCategory(button, category) {
     categorySelect.value = category;
   }
 
-  const posts = document.querySelectorAll(
-    "#communityPostList article"
-  );
-
-  posts.forEach(post => {
-    post.style.display =
-      category === "all" || post.dataset.category === category
-        ? ""
-        : "none";
-  });
+  filterCommunityPosts();
 }
 // COMMUNITY 게시글 목록 불러오기
 // COMMUNITY 게시글 고정 및 해제
@@ -2101,6 +2141,15 @@ loadCommunityComments(post.id, commentList);
 
 // 게시글 등록 버튼 연결
 document.addEventListener("DOMContentLoaded", () => {
+   // 게시글 검색창 연결
+  const communitySearchInput =
+    document.getElementById("communitySearchInput");
+
+  if (communitySearchInput) {
+    communitySearchInput.addEventListener("input", () => {
+      filterCommunityPosts();
+    });
+  }
    const categorySelect =
     document.getElementById("communityPostCategory");
 
