@@ -1171,7 +1171,20 @@ async function loadVisitorLogs() {
       await window.gomgaeSupabase.auth.getUser();
 
     if (userError) throw userError;
+// 현재 연구원의 운영자 권한 확인
+const { data: currentResearcher, error: researcherError } =
+  await window.gomgaeSupabase
+    .from("researchers")
+    .select("researcher_number, is_operator, is_active")
+    .eq("auth_user_id", user.id)
+    .maybeSingle();
 
+if (researcherError) throw researcherError;
+
+const isOperator =
+  currentResearcher?.is_operator === true &&
+  currentResearcher?.is_active === true;
+   
     if (!user) {
       if (writePanel) writePanel.style.display = "none";
       if (loginNotice) loginNotice.style.display = "block";
@@ -1958,6 +1971,34 @@ category.textContent = post.category;
       content.style.whiteSpace = "pre-wrap";
       content.style.marginTop = "10px";
 
+     // 게시글 고정 버튼
+if (isOperator) {
+  const pinButton = document.createElement("button");
+  pinButton.type = "button";
+  pinButton.textContent = post.is_pinned
+    ? "📌 고정 해제"
+    : "📌 상단 고정";
+
+  pinButton.style.marginTop = "12px";
+
+  pinButton.addEventListener("click", () => {
+    toggleCommunityPin(post.id, post.is_pinned);
+  });
+
+  card.appendChild(pinButton);
+}
+
+// 고정 게시글 표시
+if (post.is_pinned) {
+  const pinnedLabel = document.createElement("span");
+  pinnedLabel.textContent = " 📌 상단 고정 게시글";
+  pinnedLabel.style.display = "block";
+  pinnedLabel.style.marginTop = "8px";
+  pinnedLabel.style.fontWeight = "bold";
+
+  card.appendChild(pinnedLabel);
+}
+     
      // 게시글 반응 영역
 const reactionSection = document.createElement("div");
 reactionSection.className = "community-reactions";
