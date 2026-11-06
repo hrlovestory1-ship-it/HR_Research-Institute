@@ -159,6 +159,13 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
     <small>연구원 방명록</small>
   </span>
 </button>
+  <button data-page="community" onclick="showPage('community',this)">
+  <span class="nav-icon">✉</span>
+  <span class="nav-copy">
+    <b>COMMUNITY</b>
+    <small>연구원 소통 공간</small>
+  </span>
+</button>
 
   <button class="secret" data-page="location" onclick="showPage('location',this)"><span class="nav-icon">♙</span><span class="nav-copy"><b>CLASSIFIED LOCATION</b><small>연구소 위치 · TOP SECRET</small></span></button>
  </nav>
@@ -525,6 +532,67 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
 
   <div id="visitorLogList">
     <p>기록을 불러오는 중입니다.</p>
+  </div>
+
+</section>
+
+<!-- COMMUNITY -->
+<section class="page" id="page-community">
+
+  <div class="section-head">
+    <div>
+      <div class="section-no">13 / COMMUNITY</div>
+      <h2>연구원 커뮤니티</h2>
+      <p>INTERNAL RESEARCHER COMMUNICATION</p>
+    </div>
+  </div>
+
+  <!-- 게시글 작성 -->
+  <article class="profile-card" style="margin-bottom:24px;">
+    <div class="eyebrow">NEW TRANSMISSION</div>
+    <h3>새로운 게시글 작성</h3>
+    <p>연구원들과 공유하고 싶은 이야기를 남겨주세요.</p>
+
+    <div id="communityWritePanel">
+
+      <input
+        type="text"
+        id="communityPostTitle"
+        maxlength="100"
+        placeholder="게시글 제목을 입력해 주세요."
+      >
+
+      <textarea
+        id="communityPostContent"
+        maxlength="5000"
+        rows="6"
+        placeholder="연구원들에게 전할 내용을 작성해 주세요."
+      ></textarea>
+
+      <button class="dark-action" id="communitySubmitButton">
+        게시글 등록 →
+      </button>
+
+      <p id="communityWriteStatus"></p>
+
+    </div>
+
+    <p id="communityLoginNotice" style="display:none;">
+      연구원 로그인 후 이용할 수 있습니다.
+    </p>
+  </article>
+
+  <!-- 게시글 목록 -->
+  <div class="section-head">
+    <div>
+      <div class="section-no">COMMUNICATION ARCHIVE</div>
+      <h2>RESEARCHER BOARD</h2>
+      <p>연구원들의 게시글과 소통 기록</p>
+    </div>
+  </div>
+
+  <div id="communityPostList">
+    <p>게시글을 불러오는 중입니다.</p>
   </div>
 
 </section>
