@@ -1866,7 +1866,34 @@ function selectCategory(button, category) {
   });
 }
 // COMMUNITY 게시글 목록 불러오기
-async function loadCommunityPosts() {
+// COMMUNITY 게시글 고정 및 해제
+async function toggleCommunityPin(postId, currentStatus) {
+  const action = currentStatus ? "고정을 해제" : "고정";
+
+  if (!confirm(`이 게시글을 ${action}하시겠습니까?`)) {
+    return;
+  }
+
+  try {
+    const { error } = await window.gomgaeSupabase
+      .from("community_posts")
+      .update({ is_pinned: !currentStatus })
+      .eq("id", postId);
+
+    if (error) throw error;
+
+    alert(currentStatus
+      ? "게시글 고정이 해제되었습니다."
+      : "게시글이 상단에 고정되었습니다.");
+
+    await loadCommunityPosts();
+
+  } catch (error) {
+    console.error("Community pin error:", error);
+    alert("게시글 고정 처리에 실패했습니다.");
+  }
+}
+ async function loadCommunityPosts() {
   const list = document.getElementById("communityPostList");
   const writePanel = document.getElementById("communityWritePanel");
   const loginNotice = document.getElementById("communityLoginNotice");
@@ -1890,9 +1917,10 @@ async function loadCommunityPosts() {
 
     const { data: posts, error } =
       await window.gomgaeSupabase
-        .from("community_posts")
-        .select("id, created_at, updated_at, researcher_number, category, title, content")
-        .order("created_at", { ascending: false });
+.from("community_posts")
+.select("id, created_at, updated_at, researcher_number, category, title, content, is_pinned")
+.order("is_pinned", { ascending: false })
+.order("created_at", { ascending: false });
 
     if (error) throw error;
 
