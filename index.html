@@ -1370,7 +1370,7 @@ async function submitCommunityPost() {
   }
 }
 // COMMUNITY 댓글 등록
-async function submitCommunityComment(postId, input) {
+async function submitCommunityComment(postId, input, parentCommentId = null) {
   const content = input.value.trim();
 
   if (!content) {
@@ -1404,19 +1404,19 @@ async function submitCommunityComment(postId, input) {
 
     const { error } = await window.gomgaeSupabase
       .from("community_comments")
-      .insert({
-        post_id: postId,
-        researcher_number: researcher.researcher_number,
-        content: content
-      });
+.insert({
+  post_id: postId,
+  parent_comment_id: parentCommentId,
+  researcher_number: researcher.researcher_number,
+  content: content
+});
 
     if (error) throw error;
 
     input.value = "";
 
-    const commentList = input.parentElement.querySelector(
-      ".community-comment-list"
-    );
+const commentList = input.closest(".community-comments")
+  .querySelector(".community-comment-list");
 
     await loadCommunityComments(postId, commentList);
 
@@ -1427,6 +1427,7 @@ async function submitCommunityComment(postId, input) {
 }
  
 // COMMUNITY 댓글 목록 불러오기
+// COMMUNITY 댓글 및 답글 불러오기
 async function loadCommunityComments(postId, list) {
   try {
     const { data: comments, error } =
@@ -1445,30 +1446,96 @@ async function loadCommunityComments(postId, list) {
       return;
     }
 
-    comments
-      .filter(comment => comment.parent_comment_id === null)
-      .forEach(comment => {
-        const item = document.createElement("div");
-        item.style.marginTop = "12px";
-        item.style.padding = "12px";
-        item.style.background = "#f5f1e9";
-        item.style.borderRadius = "8px";
+    const topComments = comments.filter(
+      comment => comment.parent_comment_id === null
+    );
 
-        const author = document.createElement("strong");
-        author.textContent = comment.researcher_number;
+    topComments.forEach(comment => {
+      const item = document.createElement("div");
+      item.style.marginTop = "12px";
+      item.style.padding = "12px";
+      item.style.background = "#f5f1e9";
+      item.style.borderRadius = "8px";
 
-        const date = document.createElement("small");
-        date.textContent =
-          " · " + new Date(comment.created_at).toLocaleString("ko-KR");
+      const author = document.createElement("strong");
+      author.textContent = comment.researcher_number;
 
-        const content = document.createElement("p");
-        content.textContent = comment.content;
-        content.style.whiteSpace = "pre-wrap";
-        content.style.marginTop = "8px";
+      const date = document.createElement("small");
+      date.textContent =
+        " · " + new Date(comment.created_at).toLocaleString("ko-KR");
 
-        item.append(author, date, content);
-        list.appendChild(item);
+      const content = document.createElement("p");
+      content.textContent = comment.content;
+      content.style.whiteSpace = "pre-wrap";
+      content.style.marginTop = "8px";
+
+      const replyButton = document.createElement("button");
+      replyButton.textContent = "답글 달기";
+      replyButton.className = "dark-action";
+      replyButton.style.marginTop = "8px";
+
+      const replyArea = document.createElement("div");
+      replyArea.style.display = "none";
+      replyArea.style.marginTop = "10px";
+
+      const replyInput = document.createElement("textarea");
+      replyInput.placeholder = "답글을 입력하세요.";
+      replyInput.rows = 2;
+      replyInput.style.width = "100%";
+
+      const replySubmit = document.createElement("button");
+      replySubmit.textContent = "답글 등록";
+      replySubmit.className = "dark-action";
+
+      replyButton.addEventListener("click", () => {
+        replyArea.style.display =
+          replyArea.style.display === "none" ? "block" : "none";
       });
+
+      replySubmit.addEventListener("click", () => {
+        submitCommunityComment(postId, replyInput, comment.id);
+      });
+
+      replyArea.append(replyInput, replySubmit);
+
+      const replies = document.createElement("div");
+      replies.style.marginLeft = "20px";
+
+      comments
+        .filter(reply => reply.parent_comment_id === comment.id)
+        .forEach(reply => {
+          const replyItem = document.createElement("div");
+          replyItem.style.marginTop = "10px";
+          replyItem.style.padding = "10px";
+          replyItem.style.background = "#ebe5d9";
+          replyItem.style.borderRadius = "8px";
+
+          const replyAuthor = document.createElement("strong");
+          replyAuthor.textContent = reply.researcher_number;
+
+          const replyDate = document.createElement("small");
+          replyDate.textContent =
+            " · " + new Date(reply.created_at).toLocaleString("ko-KR");
+
+          const replyContent = document.createElement("p");
+          replyContent.textContent = reply.content;
+          replyContent.style.whiteSpace = "pre-wrap";
+
+          replyItem.append(replyAuthor, replyDate, replyContent);
+          replies.appendChild(replyItem);
+        });
+
+      item.append(
+        author,
+        date,
+        content,
+        replyButton,
+        replyArea,
+        replies
+      );
+
+      list.appendChild(item);
+    });
 
   } catch (error) {
     console.error("Community comment loading error:", error);
