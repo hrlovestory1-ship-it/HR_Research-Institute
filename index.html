@@ -1430,6 +1430,25 @@ const commentList = input.closest(".community-comments")
 // COMMUNITY 댓글 및 답글 불러오기
 async function loadCommunityComments(postId, list) {
   try {
+       const { data: { user }, error: userError } =
+      await window.gomgaeSupabase.auth.getUser();
+
+    if (userError) throw userError;
+
+    let currentResearcher = null;
+
+    if (user) {
+      const { data: researcher, error: researcherError } =
+        await window.gomgaeSupabase
+          .from("researchers")
+          .select("researcher_number, is_operator")
+          .eq("auth_user_id", user.id)
+          .maybeSingle();
+
+      if (researcherError) throw researcherError;
+
+      currentResearcher = researcher;
+    }
     const { data: comments, error } =
       await window.gomgaeSupabase
         .from("community_comments")
@@ -1521,25 +1540,139 @@ async function loadCommunityComments(postId, list) {
           replyContent.textContent = reply.content;
           replyContent.style.whiteSpace = "pre-wrap";
 
-          replyItem.append(replyAuthor, replyDate, replyContent);
-          replies.appendChild(replyItem);
+replyItem.append(replyAuthor, replyDate, replyContent);
+
+// 본인 답글 또는 운영자에게만 수정·삭제 버튼 표시
+if (
+  currentResearcher &&
+  (
+    currentResearcher.researcher_number === reply.researcher_number ||
+    currentResearcher.is_operator
+  )
+) {
+  const replyActions = document.createElement("div");
+  replyActions.style.marginTop = "8px";
+
+  const replyEditButton = document.createElement("button");
+  replyEditButton.textContent = "수정";
+  replyEditButton.className = "dark-action";
+
+  replyEditButton.addEventListener("click", () => {
+    editCommunityComment(reply.id);
+  });
+
+  const replyDeleteButton = document.createElement("button");
+  replyDeleteButton.textContent = "삭제";
+  replyDeleteButton.className = "dark-action";
+  replyDeleteButton.style.marginLeft = "6px";
+
+  replyDeleteButton.addEventListener("click", () => {
+    deleteCommunityComment(reply.id);
+  });
+
+  replyActions.append(replyEditButton, replyDeleteButton);
+  replyItem.appendChild(replyActions);
+}
+
+replies.appendChild(replyItem);
         });
 
-      item.append(
-        author,
-        date,
-        content,
-        replyButton,
-        replyArea,
-        replies
-      );
+item.append(
+  author,
+  date,
+  content,
+  replyButton,
+  replyArea,
+  replies
+);
 
-      list.appendChild(item);
+// 본인 댓글 또는 운영자에게만 수정·삭제 버튼 표시
+if (
+  currentResearcher &&
+  (
+    currentResearcher.researcher_number === comment.researcher_number ||
+    currentResearcher.is_operator
+  )
+) {
+  const actions = document.createElement("div");
+  actions.style.marginTop = "8px";
+
+  const editButton = document.createElement("button");
+  editButton.textContent = "수정";
+  editButton.className = "dark-action";
+
+  editButton.addEventListener("click", () => {
+    editCommunityComment(comment.id);
+  });
+
+  const deleteButton = document.createElement("button");
+  deleteButton.textContent = "삭제";
+  deleteButton.className = "dark-action";
+  deleteButton.style.marginLeft = "6px";
+
+  deleteButton.addEventListener("click", () => {
+    deleteCommunityComment(comment.id);
+  });
+
+  actions.append(editButton, deleteButton);
+  item.appendChild(actions);
+}
+
+list.appendChild(item);
     });
 
   } catch (error) {
     console.error("Community comment loading error:", error);
     list.textContent = "댓글을 불러오지 못했습니다.";
+  }
+}
+
+ // COMMUNITY 댓글 수정
+async function editCommunityComment(commentId) {
+  const newContent = prompt("수정할 댓글 내용을 입력해 주세요.");
+
+  if (newContent === null) return;
+
+  if (!newContent.trim()) {
+    alert("댓글 내용을 입력해 주세요.");
+    return;
+  }
+
+  try {
+    const { error } = await window.gomgaeSupabase
+      .from("community_comments")
+      .update({ content: newContent.trim() })
+      .eq("id", commentId);
+
+    if (error) throw error;
+
+    alert("댓글이 수정되었습니다.");
+    await loadCommunityPosts();
+
+  } catch (error) {
+    console.error("Comment edit error:", error);
+    alert("댓글 수정에 실패했습니다.");
+  }
+}
+
+// COMMUNITY 댓글 삭제
+async function deleteCommunityComment(commentId) {
+  if (!confirm("이 댓글을 삭제하시겠습니까?")) return;
+
+  try {
+    const { error } = await window.gomgaeSupabase
+      .from("community_comments")
+      .delete()
+      .eq("id", commentId);
+
+    if (error) throw error;
+
+    alert("댓글이 삭제되었습니다.");
+    await loadCommunityPosts();
+
+  } catch (error) {
+    console.error("Comment delete error:", error);
+    alert("댓글 삭제에 실패했습니다.");
   }
 }
  
