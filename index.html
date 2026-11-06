@@ -476,6 +476,59 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
   </div>
 </section>
 
+<!-- VISITOR LOG -->
+<section class="page" id="page-visitorlog">
+
+  <div class="section-head">
+    <div>
+      <div class="section-no">12 / VISITOR LOG</div>
+      <h2>연구원 방명록</h2>
+      <p>RESEARCHER COMMUNICATION RECORD</p>
+    </div>
+  </div>
+
+  <article class="profile-card" style="margin-bottom:24px;">
+    <div class="eyebrow">LEAVE YOUR RECORD</div>
+    <h3>연구소 기록 남기기</h3>
+    <p>연구원 여러분의 메시지를 기록해 주세요.</p>
+
+    <div id="visitorLogWritePanel">
+      <textarea
+        id="visitorLogMessage"
+        maxlength="500"
+        rows="4"
+        placeholder="연구소에 남기고 싶은 메시지를 입력해 주세요."
+      ></textarea>
+
+      <button
+        class="dark-action"
+        onclick="submitVisitorLog()"
+      >
+        기록 등록 →
+      </button>
+
+      <p id="visitorLogMessageStatus"></p>
+    </div>
+
+    <p id="visitorLogLoginNotice" style="display:none;">
+      연구원 인증 후 기록을 남길 수 있습니다.
+    </p>
+  </article>
+
+  <div class="section-head">
+    <div>
+      <div class="section-no">ARCHIVE</div>
+      <h2>RESEARCHER RECORDS</h2>
+      <p>연구원들이 남긴 기록</p>
+    </div>
+  </div>
+
+  <div id="visitorLogList">
+    <p>기록을 불러오는 중입니다.</p>
+  </div>
+
+</section>
+
 
 <!-- LOCATION -->
 <section class="page" id="page-location">
