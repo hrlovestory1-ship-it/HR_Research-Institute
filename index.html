@@ -1928,6 +1928,20 @@ async function toggleCommunityPin(postId, currentStatus) {
       return;
     }
 
+       // 현재 연구원의 운영자 권한 확인
+    const { data: operatorResearcher, error: operatorLookupError } =
+      await window.gomgaeSupabase
+        .from("researchers")
+        .select("researcher_number, is_operator, is_active")
+        .eq("auth_user_id", user.id)
+        .maybeSingle();
+
+    if (operatorLookupError) throw operatorLookupError;
+
+    const isOperator =
+      operatorResearcher?.is_operator === true &&
+      operatorResearcher?.is_active === true;
+   
     const { data: posts, error } =
       await window.gomgaeSupabase
 .from("community_posts")
