@@ -326,14 +326,38 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
  <div class="section-head"><div><div class="section-no">09 / RESEARCHER COMMUNITY</div><h2>연구원 커뮤니티</h2><p>DISCUSSION · INFORMATION · NOTICE</p></div></div>
  <div class="preview-warning">연구원 전용 게시판 디자인 미리보기입니다. 실제 글쓰기·댓글·수정·삭제 및 권한 관리는 로그인과 데이터베이스 연결 후 작동합니다.</div>
  <div class="community-layout"><div class="category-list"><button class="active" onclick="selectCategory(this,'all')">전체 게시글</button><button onclick="selectCategory(this,'공지사항')">공지사항</button><button onclick="selectCategory(this,'자유 연구실')">자유 연구실</button><button onclick="selectCategory(this,'연구 토론실')">연구 토론실</button><button onclick="selectCategory(this,'자료 제보실')">자료 제보실</button></div>
- <div class="post-list" id="postList">
-  <div class="post" data-category="공지사항"><span class="cat">공지사항</span><b>곰개연구소 연구원 이용 안내</b><small>ADMIN · 11.04</small></div>
-  <div class="post" data-category="연구 토론실"><span class="cat">연구 토론실</span><b>[토론] 먼저 마음을 자각한 개체는 누구인가?</b><small>HR-003 · 11.03</small></div>
-  <div class="post" data-category="자료 제보실"><span class="cat">자료 제보실</span><b>신규 관찰 자료 제보합니다.</b><small>HR-012 · 11.02</small></div>
-  <div class="post" data-category="자유 연구실"><span class="cat">자유 연구실</span><b>오늘의 연구원 잡담 공간</b><small>HR-008 · 11.01</small></div>
- </div></div>
- <div class="form-preview" style="margin-top:14px"><h3 style="font:600 15px var(--serif)">NEW DISCUSSION</h3><label>게시글 제목</label><input placeholder="게시글 제목을 입력하세요"><label>내용</label><textarea placeholder="연구원들과 나눌 이야기를 작성하세요."></textarea><button class="dark-action" onclick="alert('게시글 작성 기능은 Supabase 연결 후 사용할 수 있습니다.')">게시글 작성 · 미리보기</button></div>
-</section>
+ <div class="post-list" id="communityPostList">
+  <p>게시글을 불러오는 중입니다.</p>
+</div>
+</div></div>
+<div class="form-preview" style="margin-top:14px">
+  <h3 style="font:600 15px var(--serif)">NEW DISCUSSION</h3>
+
+  <label>게시글 제목</label>
+  <input
+    type="text"
+    id="communityPostTitle"
+    maxlength="100"
+    placeholder="게시글 제목을 입력하세요."
+  >
+
+  <label>내용</label>
+  <textarea
+    id="communityPostContent"
+    maxlength="5000"
+    rows="6"
+    placeholder="연구원들과 나눌 이야기를 작성하세요."
+  ></textarea>
+
+  <button class="dark-action" id="communitySubmitButton">
+    게시글 등록 →
+  </button>
+
+  <p id="communityWriteStatus"></p>
+  <p id="communityLoginNotice" style="display:none;">
+    연구원 로그인 후 이용할 수 있습니다.
+  </p>
+</div></section>
 
 <!-- RESEARCH LOG -->
 <section class="page" id="page-log">
@@ -537,65 +561,7 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
 </section>
 
 <!-- COMMUNITY -->
-<section class="page" id="page-community">
 
-  <div class="section-head">
-    <div>
-      <div class="section-no">13 / COMMUNITY</div>
-      <h2>연구원 커뮤니티</h2>
-      <p>INTERNAL RESEARCHER COMMUNICATION</p>
-    </div>
-  </div>
-
-  <!-- 게시글 작성 -->
-  <article class="profile-card" style="margin-bottom:24px;">
-    <div class="eyebrow">NEW TRANSMISSION</div>
-    <h3>새로운 게시글 작성</h3>
-    <p>연구원들과 공유하고 싶은 이야기를 남겨주세요.</p>
-
-    <div id="communityWritePanel">
-
-      <input
-        type="text"
-        id="communityPostTitle"
-        maxlength="100"
-        placeholder="게시글 제목을 입력해 주세요."
-      >
-
-      <textarea
-        id="communityPostContent"
-        maxlength="5000"
-        rows="6"
-        placeholder="연구원들에게 전할 내용을 작성해 주세요."
-      ></textarea>
-
-      <button class="dark-action" id="communitySubmitButton">
-        게시글 등록 →
-      </button>
-
-      <p id="communityWriteStatus"></p>
-
-    </div>
-
-    <p id="communityLoginNotice" style="display:none;">
-      연구원 로그인 후 이용할 수 있습니다.
-    </p>
-  </article>
-
-  <!-- 게시글 목록 -->
-  <div class="section-head">
-    <div>
-      <div class="section-no">COMMUNICATION ARCHIVE</div>
-      <h2>RESEARCHER BOARD</h2>
-      <p>연구원들의 게시글과 소통 기록</p>
-    </div>
-  </div>
-
-  <div id="communityPostList">
-    <p>게시글을 불러오는 중입니다.</p>
-  </div>
-
-</section>
 
 
 <!-- LOCATION -->
