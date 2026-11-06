@@ -1627,6 +1627,126 @@ list.appendChild(item);
   }
 }
 
+ // COMMUNITY 게시글 반응 불러오기
+async function loadCommunityReactions(postId, container) {
+  try {
+    const { data: reactions, error } =
+      await window.gomgaeSupabase
+        .from("community_reactions")
+        .select("researcher_number, reaction_type")
+        .eq("post_id", postId);
+
+    if (error) throw error;
+
+    const reactionTypes = [
+      { type: "bear", emoji: "🐻" },
+      { type: "heart", emoji: "❤️" },
+      { type: "dog", emoji: "🐶" },
+      { type: "paw", emoji: "🐾" }
+    ];
+
+    container.replaceChildren();
+
+    reactionTypes.forEach(reaction => {
+      const count = reactions.filter(
+        item => item.reaction_type === reaction.type
+      ).length;
+
+      const button = document.createElement("button");
+      button.textContent = `${reaction.emoji} ${count}`;
+      button.style.marginRight = "8px";
+
+      container.appendChild(button);
+    });
+
+  } catch (error) {
+    console.error("Reaction loading error:", error);
+    container.textContent = "반응을 불러오지 못했습니다.";
+  }
+}
+
+ // COMMUNITY 게시글 반응 등록 및 변경
+async function toggleCommunityReaction(postId, reactionType, container) {
+  try {
+    // 로그인한 사용자 확인
+    const { data: { user }, error: userError } =
+      await window.gomgaeSupabase.auth.getUser();
+
+    if (userError) throw userError;
+
+    if (!user) {
+      alert("로그인 후 반응을 남길 수 있습니다.");
+      return;
+    }
+
+    // 연구원 정보 확인
+    const { data: researcher, error: researcherError } =
+      await window.gomgaeSupabase
+        .from("researchers")
+        .select("researcher_number, is_active")
+        .eq("auth_user_id", user.id)
+        .maybeSingle();
+
+    if (researcherError) throw researcherError;
+
+    if (!researcher || !researcher.is_active) {
+      alert("활동 중인 연구원만 반응을 남길 수 있습니다.");
+      return;
+    }
+
+    // 해당 게시글에 내가 남긴 기존 반응 확인
+    const { data: existingReaction, error: reactionError } =
+      await window.gomgaeSupabase
+        .from("community_reactions")
+        .select("id, reaction_type")
+        .eq("post_id", postId)
+        .eq("researcher_number", researcher.researcher_number)
+        .maybeSingle();
+
+    if (reactionError) throw reactionError;
+
+    // 같은 이모지를 다시 누르면 취소
+    if (existingReaction?.reaction_type === reactionType) {
+      const { error } = await window.gomgaeSupabase
+        .from("community_reactions")
+        .delete()
+        .eq("id", existingReaction.id);
+
+      if (error) throw error;
+    }
+
+    // 다른 이모지를 누르면 기존 반응 변경
+    else if (existingReaction) {
+      const { error } = await window.gomgaeSupabase
+        .from("community_reactions")
+        .update({ reaction_type: reactionType })
+        .eq("id", existingReaction.id);
+
+      if (error) throw error;
+    }
+
+    // 처음 반응하는 경우 새로 등록
+    else {
+      const { error } = await window.gomgaeSupabase
+        .from("community_reactions")
+        .insert({
+          post_id: postId,
+          researcher_number: researcher.researcher_number,
+          reaction_type: reactionType
+        });
+
+      if (error) throw error;
+    }
+
+    // 반응 개수 새로고침
+    await loadCommunityReactions(postId, container);
+
+  } catch (error) {
+    console.error("Reaction error:", error);
+    alert("반응 처리에 실패했습니다.");
+  }
+}
+ 
  // COMMUNITY 댓글 수정
 async function editCommunityComment(commentId, oldContent) {
   const newContent = prompt(
@@ -1769,6 +1889,40 @@ category.textContent = post.category;
       content.style.whiteSpace = "pre-wrap";
       content.style.marginTop = "10px";
 
+     // 게시글 반응 영역
+const reactionSection = document.createElement("div");
+reactionSection.className = "community-reactions";
+reactionSection.style.marginTop = "15px";
+reactionSection.style.marginBottom = "15px";
+
+const reactionTypes = [
+  { type: "bear", emoji: "🐻" },
+  { type: "heart", emoji: "❤️" },
+  { type: "dog", emoji: "🐶" },
+  { type: "paw", emoji: "🐾" }
+];
+
+reactionTypes.forEach(reaction => {
+  const reactionButton = document.createElement("button");
+  reactionButton.type = "button";
+  reactionButton.textContent = `${reaction.emoji} 0`;
+  reactionButton.style.marginRight = "8px";
+  reactionButton.style.cursor = "pointer";
+
+  reactionButton.addEventListener("click", () => {
+    toggleCommunityReaction(
+      post.id,
+      reaction.type,
+      reactionSection
+    );
+  });
+
+  reactionSection.appendChild(reactionButton);
+});
+
+// 현재 반응 개수 불러오기
+loadCommunityReactions(post.id, reactionSection);
+     
       // 댓글 영역
 const commentSection = document.createElement("section");
 commentSection.className = "community-comments";
@@ -1805,6 +1959,7 @@ card.append(
   date,
   title,
   content,
+  reactionSection,
   commentSection
 );
 
