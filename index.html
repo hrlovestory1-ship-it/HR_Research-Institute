@@ -582,9 +582,6 @@ window.gomgaeSupabase = window.supabase.createClient(
 <script>
 
 async function loadResearcherProfile() {
- 
-  return researcher;
-}
   const { data: { user }, error: userError } =
     await window.gomgaeSupabase.auth.getUser();
 
@@ -595,7 +592,7 @@ async function loadResearcherProfile() {
   const { data: researcher, error } =
     await window.gomgaeSupabase
       .from("researchers")
-      .select("researcher_number, researcher_name, role, is_active, must_change_password")
+      .select("researcher_number, researcher_name, role, position, is_active, must_change_password")
       .eq("auth_user_id", user.id)
       .maybeSingle();
 
@@ -609,7 +606,6 @@ async function loadResearcherProfile() {
 
   return researcher;
 }
-
 
 // 상단 로그인 버튼 정보 변경
 function updateResearcherButton(researcher) {
