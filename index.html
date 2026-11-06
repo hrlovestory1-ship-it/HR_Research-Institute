@@ -89,8 +89,19 @@ button,input,textarea,select{font:inherit}button{cursor:pointer}a{color:inherit;
 .area-grid{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);margin-top:23px;background:var(--paper2)}.area{padding:16px;border-right:1px solid var(--line)}.area:last-child{border:0}.area b{display:block;font-size:11px}.area small{font:8px var(--mono);color:var(--muted)}
 .subject-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 .subject-card{display:grid;grid-template-columns:130px 1fr;border:1px solid var(--line);background:var(--paper2);min-height:140px}
-.subject-art{display:grid;place-items:center;background:linear-gradient(135deg,#cfc5b6,#e9e2d7);font-size:43px;filter:grayscale(1)}
-.subject-details{padding:16px}.subject-details small{font:9px var(--mono);color:var(--brown)}.subject-details h3{font:600 18px var(--serif);margin:5px 0}.subject-details p{font-size:10px;color:var(--muted)}
+.subject-art{
+  display:grid;
+  place-items:center;
+  background:#e9e2d7;
+  overflow:hidden;
+}
+
+.subject-art img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}.subject-details{padding:16px}.subject-details small{font:9px var(--mono);color:var(--brown)}.subject-details h3{font:600 18px var(--serif);margin:5px 0}.subject-details p{font-size:10px;color:var(--muted)}
 .page-toolbar{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:15px}
 .page-toolbar button{border:1px solid var(--line);background:var(--paper2);padding:8px 11px;font:9px var(--mono);color:var(--muted)}
 .page-toolbar button.active,.page-toolbar button:hover{background:var(--ink);color:#f2ede4;border-color:var(--ink)}
@@ -259,8 +270,12 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
 <section class="page" id="page-subjects">
  <div class="section-head"><div><div class="section-no">02 / REGISTERED SUBJECTS</div><h2>연구 대상</h2><p>SUBJECT PROFILE & IDENTIFICATION</p></div></div>
  <div class="subject-grid">
-  <article class="subject-card"><div class="subject-art">♟</div><div class="subject-details"><small>SUBJECT ID · PSJ-0116</small><h3>SUNGJIN</h3><p>RESEARCH SUBJECT 01<br>관찰 및 상호작용 분석 대상</p><p style="margin-top:9px">등록 상태 : ACTIVE</p></div></article>
-  <article class="subject-card"><div class="subject-art">♟</div><div class="subject-details"><small>SUBJECT ID · YDW-0825</small><h3>DOWOON</h3><p>RESEARCH SUBJECT 02<br>관찰 및 상호작용 분석 대상</p><p style="margin-top:9px">등록 상태 : ACTIVE</p></div></article>
+  <article class="subject-card"><div class="subject-art">
+  <img src="KakaoTalk_20261106_210731006.jpg" alt="SUNGJIN">
+</div><div class="subject-details"><small>SUBJECT ID · PSJ-0116</small><h3>SUNGJIN</h3><p>RESEARCH SUBJECT 01<br>관찰 및 상호작용 분석 대상</p><p style="margin-top:9px">등록 상태 : ACTIVE</p></div></article>
+  <article class="subject-card"><div class="subject-art">
+  <img src="KakaoTalk_20261106_210731006_01.jpg" alt="DOWOON">
+</div><div class="subject-details"><small>SUBJECT ID · YDW-0825</small><h3>DOWOON</h3><p>RESEARCH SUBJECT 02<br>관찰 및 상호작용 분석 대상</p><p style="margin-top:9px">등록 상태 : ACTIVE</p></div></article>
  </div>
  <div class="preview-warning" style="margin-top:14px">※ 연구 대상의 세부 프로필과 실제 사진 자료는 추후 연구 자료실에 등록할 수 있습니다.</div>
 </section>
