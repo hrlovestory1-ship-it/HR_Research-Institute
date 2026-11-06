@@ -1630,6 +1630,26 @@ list.appendChild(item);
  // COMMUNITY 게시글 반응 불러오기
 async function loadCommunityReactions(postId, container) {
   try {
+    const { data: { user }, error: userError } =
+      await window.gomgaeSupabase.auth.getUser();
+
+    if (userError) throw userError;
+
+    let myResearcherNumber = null;
+
+    if (user) {
+      const { data: researcher, error: researcherError } =
+        await window.gomgaeSupabase
+          .from("researchers")
+          .select("researcher_number")
+          .eq("auth_user_id", user.id)
+          .maybeSingle();
+
+      if (researcherError) throw researcherError;
+
+      myResearcherNumber = researcher?.researcher_number;
+    }
+
     const { data: reactions, error } =
       await window.gomgaeSupabase
         .from("community_reactions")
@@ -1652,9 +1672,30 @@ async function loadCommunityReactions(postId, container) {
         item => item.reaction_type === reaction.type
       ).length;
 
+      const isSelected = reactions.some(
+        item =>
+          item.researcher_number === myResearcherNumber &&
+          item.reaction_type === reaction.type
+      );
+
       const button = document.createElement("button");
+      button.type = "button";
       button.textContent = `${reaction.emoji} ${count}`;
       button.style.marginRight = "8px";
+      button.style.cursor = "pointer";
+
+      if (isSelected) {
+        button.style.background = "#d8c5a5";
+        button.style.border = "2px solid #8b7355";
+      }
+
+      button.addEventListener("click", () => {
+        toggleCommunityReaction(
+          postId,
+          reaction.type,
+          container
+        );
+      });
 
       container.appendChild(button);
     });
