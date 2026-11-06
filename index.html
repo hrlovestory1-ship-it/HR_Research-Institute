@@ -332,6 +332,13 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
 </div></div>
 <div class="form-preview" style="margin-top:14px">
   <h3 style="font:600 15px var(--serif)">NEW DISCUSSION</h3>
+ <label>게시글 분류</label>
+<select id="communityPostCategory">
+  <option value="자유 연구실">자유 연구실</option>
+  <option value="연구 토론실">연구 토론실</option>
+  <option value="자료 제보실">자료 제보실</option>
+  <option value="공지사항">공지사항</option>
+</select>
 
   <label>게시글 제목</label>
   <input
@@ -1306,6 +1313,8 @@ async function submitCommunityPost() {
 
   const title = titleInput.value.trim();
   const content = contentInput.value.trim();
+ const category =
+  document.getElementById("communityPostCategory").value;
 
   if (!title || !content) {
     status.textContent = "제목과 내용을 모두 입력해 주세요.";
@@ -1338,16 +1347,18 @@ async function submitCommunityPost() {
 
     const { error } = await window.gomgaeSupabase
       .from("community_posts")
-      .insert({
-        researcher_number: researcher.researcher_number,
-        title: title,
-        content: content
-      });
+.insert({
+  researcher_number: researcher.researcher_number,
+  category: category,
+  title: title,
+  content: content
+});
 
     if (error) throw error;
 
     titleInput.value = "";
     contentInput.value = "";
+   document.getElementById("communityPostCategory").value = "자유 연구실";
 
     status.textContent = "게시글이 등록되었습니다!";
 
@@ -1359,7 +1370,29 @@ async function submitCommunityPost() {
   }
 }
 
+// COMMUNITY 카테고리 필터
+function selectCategory(button, category) {
+  document.querySelectorAll(".category-list button")
+    .forEach(btn => btn.classList.remove("active"));
 
+  button.classList.add("active");
+
+  const posts = document.querySelectorAll(
+    "#communityPostList article"
+  );
+
+  posts.forEach(post => {
+    if (
+      category === "all" ||
+      post.dataset.category === category
+    ) {
+      post.style.display = "";
+    } else {
+      post.style.display = "none";
+    }
+  });
+}
+ 
 // COMMUNITY 게시글 목록 불러오기
 async function loadCommunityPosts() {
   const list = document.getElementById("communityPostList");
@@ -1386,7 +1419,7 @@ async function loadCommunityPosts() {
     const { data: posts, error } =
       await window.gomgaeSupabase
         .from("community_posts")
-        .select("id, created_at, updated_at, researcher_number, title, content")
+        .select("id, created_at, updated_at, researcher_number, category, title, content")
         .order("created_at", { ascending: false });
 
     if (error) throw error;
@@ -1406,6 +1439,10 @@ async function loadCommunityPosts() {
       card.className = "profile-card";
       card.style.marginBottom = "20px";
 
+     const category = document.createElement("span");
+category.className = "cat";
+category.textContent = post.category;
+     card.dataset.category = post.category;
       const author = document.createElement("strong");
       author.textContent = post.researcher_number;
 
@@ -1421,7 +1458,7 @@ async function loadCommunityPosts() {
       content.style.whiteSpace = "pre-wrap";
       content.style.marginTop = "10px";
 
-      card.append(author, date, title, content);
+      card.append(category, author, date, title, content);
       list.appendChild(card);
     });
 
