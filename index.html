@@ -1371,28 +1371,31 @@ async function submitCommunityPost() {
 }
 
 // COMMUNITY 카테고리 필터
+// COMMUNITY 카테고리 연동
 function selectCategory(button, category) {
   document.querySelectorAll(".category-list button")
     .forEach(btn => btn.classList.remove("active"));
 
   button.classList.add("active");
 
+  const categorySelect =
+    document.getElementById("communityPostCategory");
+
+  if (category !== "all" && categorySelect) {
+    categorySelect.value = category;
+  }
+
   const posts = document.querySelectorAll(
     "#communityPostList article"
   );
 
   posts.forEach(post => {
-    if (
-      category === "all" ||
-      post.dataset.category === category
-    ) {
-      post.style.display = "";
-    } else {
-      post.style.display = "none";
-    }
+    post.style.display =
+      category === "all" || post.dataset.category === category
+        ? ""
+        : "none";
   });
 }
- 
 // COMMUNITY 게시글 목록 불러오기
 async function loadCommunityPosts() {
   const list = document.getElementById("communityPostList");
@@ -1471,6 +1474,26 @@ category.textContent = post.category;
 
 // 게시글 등록 버튼 연결
 document.addEventListener("DOMContentLoaded", () => {
+   const categorySelect =
+    document.getElementById("communityPostCategory");
+
+  if (categorySelect) {
+    categorySelect.addEventListener("change", () => {
+      const category = categorySelect.value;
+
+      const categoryButton = Array.from(
+        document.querySelectorAll(".category-list button")
+      ).find(button =>
+        button.getAttribute("onclick")?.includes(
+          "'" + category + "'"
+        )
+      );
+
+      if (categoryButton) {
+        selectCategory(categoryButton, category);
+      }
+    });
+  }
   const button = document.getElementById("communitySubmitButton");
 
   if (button) {
