@@ -177,6 +177,13 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
     <small>연구원 방명록</small>
   </span>
 </button>
+  <button data-page="guestbook" onclick="showPage('guestbook',this)">
+  <span class="nav-icon">✉</span>
+  <span class="nav-copy">
+    <b>GUESTBOOK</b>
+    <small>방문자의 기록</small>
+  </span>
+</button>
   <button data-page="community" onclick="showPage('community',this)">
   <span class="nav-icon">✉</span>
   <span class="nav-copy">
@@ -623,6 +630,84 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
 
 </section>
 
+ <!-- GUESTBOOK -->
+
+<section class="page" id="page-guestbook">
+
+  <div class="section-head">
+    <div>
+      <div class="section-no">13 / GUESTBOOK</div>
+      <h2>방문자의 기록</h2>
+      <p>VISITOR MESSAGES & MEMORIES</p>
+    </div>
+  </div>
+
+  <div class="preview-warning">
+    연구소를 방문해 주셔서 감사합니다.
+    방문자의 소중한 기록을 이곳에 남겨주세요.
+  </div>
+
+  <article class="profile-card" style="margin-top:20px;">
+    <div class="eyebrow">LEAVE YOUR MESSAGE</div>
+    <h3>연구소에 흔적 남기기</h3>
+    <p>이름을 남기거나 익명으로 방문 기록을 작성할 수 있습니다.</p>
+
+    <div id="guestbookWritePanel">
+
+      <div id="guestbookNameArea">
+        <label for="guestbookName">방문자 이름</label>
+        <input
+          type="text"
+          id="guestbookName"
+          maxlength="30"
+          placeholder="이름 또는 별명을 입력하세요."
+        >
+
+        <label style="display:flex;align-items:center;gap:8px;margin-top:10px;">
+          <input type="checkbox" id="guestbookAnonymous">
+          익명으로 작성하기
+        </label>
+      </div>
+
+      <div id="guestbookResearcherNotice" style="display:none;">
+        <p>연구원 계정으로 방문 기록을 남깁니다.</p>
+      </div>
+
+      <label for="guestbookMessage">메시지</label>
+      <textarea
+        id="guestbookMessage"
+        maxlength="1000"
+        rows="5"
+        placeholder="연구소에 남기고 싶은 이야기를 작성해 주세요."
+      ></textarea>
+
+      <button
+        class="dark-action"
+        id="guestbookSubmitButton"
+        onclick="submitGuestbookEntry()"
+      >
+        기록 등록 →
+      </button>
+
+      <p id="guestbookWriteStatus"></p>
+
+    </div>
+  </article>
+
+  <div class="section-head" style="margin-top:30px;">
+    <div>
+      <div class="section-no">VISITOR ARCHIVE</div>
+      <h2>GUEST RECORDS</h2>
+      <p>방문자들이 남긴 기록</p>
+    </div>
+  </div>
+
+  <div id="guestbookList">
+    <p>방명록을 불러오는 중입니다.</p>
+  </div>
+
+</section>
+ 
 <!-- COMMUNITY -->
 
 
@@ -677,6 +762,12 @@ if (id === "visitorlog") {
  // COMMUNITY 페이지를 열면 게시글 불러오기
 if (id === "community") {
   loadCommunityPosts();
+}
+
+ // GUESTBOOK 페이지를 열면 방명록 불러오기
+if (id === "guestbook") {
+  loadGuestbookEntries();
+  updateGuestbookForm();
 }
  
   document.querySelectorAll(".nav button").forEach(b => {
@@ -1362,6 +1453,219 @@ const isOperator =
 }
 
 
+// GUESTBOOK 입력 화면 설정
+
+async function updateGuestbookForm() {
+  const nameArea = document.getElementById("guestbookNameArea");
+  const researcherNotice = document.getElementById("guestbookResearcherNotice");
+  const nameInput = document.getElementById("guestbookName");
+  const anonymousCheckbox = document.getElementById("guestbookAnonymous");
+
+  if (!nameArea || !researcherNotice) return;
+
+  // 익명 체크박스 기능 먼저 연결
+  if (anonymousCheckbox && nameInput) {
+    anonymousCheckbox.onchange = () => {
+      nameInput.disabled = anonymousCheckbox.checked;
+
+      if (anonymousCheckbox.checked) {
+        nameInput.value = "";
+      }
+    };
+  }
+
+  try {
+    const { data: { user }, error } =
+      await window.gomgaeSupabase.auth.getUser();
+
+    if (error) throw error;
+
+    if (!user) {
+      nameArea.style.display = "block";
+      researcherNotice.style.display = "none";
+      return;
+    }
+
+    try {
+      const researcher = await loadResearcherProfile();
+
+      nameArea.style.display = "none";
+      researcherNotice.style.display = "block";
+
+      researcherNotice.textContent =
+        `${researcher.researcher_number} · ${researcher.researcher_name} 연구원 계정으로 기록합니다.`;
+
+    } catch (researcherError) {
+      nameArea.style.display = "block";
+      researcherNotice.style.display = "none";
+    }
+
+  } catch (error) {
+    console.error("Guestbook form error:", error);
+    nameArea.style.display = "block";
+    researcherNotice.style.display = "none";
+  }
+}
+
+
+ 
+async function submitGuestbookEntry() {
+  const nameInput = document.getElementById("guestbookName");
+  const anonymousCheckbox = document.getElementById("guestbookAnonymous");
+  const messageInput = document.getElementById("guestbookMessage");
+  const status = document.getElementById("guestbookWriteStatus");
+  const button = document.getElementById("guestbookSubmitButton");
+
+  const message = messageInput.value.trim();
+
+  if (!message) {
+    status.textContent = "메시지를 입력해 주세요.";
+    return;
+  }
+
+  if (message.length > 1000) {
+    status.textContent = "메시지는 1000자 이내로 작성해 주세요.";
+    return;
+  }
+
+  try {
+    button.disabled = true;
+    status.textContent = "방문 기록을 등록하고 있습니다.";
+
+    const { data: { user }, error: userError } =
+      await window.gomgaeSupabase.auth.getUser();
+
+    if (userError) throw userError;
+
+    let authorName = null;
+    let isAnonymous = false;
+
+    if (user) {
+      // 로그인한 연구원인지 확인
+      try {
+        const researcher = await loadResearcherProfile();
+        authorName = researcher.researcher_name;
+        isAnonymous = false;
+
+      } catch (researcherError) {
+        // 일반 로그인 방문자는 이름 또는 익명 선택
+        isAnonymous = anonymousCheckbox.checked;
+
+        if (!isAnonymous) {
+          authorName = nameInput.value.trim();
+
+          if (!authorName) {
+            status.textContent = "이름을 입력하거나 익명을 선택해 주세요.";
+            return;
+          }
+        }
+      }
+
+    } else {
+      // 비로그인 방문자
+      isAnonymous = anonymousCheckbox.checked;
+
+      if (!isAnonymous) {
+        authorName = nameInput.value.trim();
+
+        if (!authorName) {
+          status.textContent = "이름을 입력하거나 익명을 선택해 주세요.";
+          return;
+        }
+      }
+    }
+
+    const { error } = await window.gomgaeSupabase
+      .from("guestbook_entries")
+      .insert({
+        author_name: authorName,
+        is_anonymous: isAnonymous,
+        message: message
+      });
+
+    if (error) throw error;
+
+    messageInput.value = "";
+    nameInput.value = "";
+    anonymousCheckbox.checked = false;
+    nameInput.disabled = false;
+
+    status.textContent = "방문 기록이 등록되었습니다!";
+
+    await loadGuestbookEntries();
+    await updateGuestbookForm();
+
+  } catch (error) {
+    console.error("Guestbook submit error:", error);
+    status.textContent = "기록 등록에 실패했습니다. 다시 시도해 주세요.";
+  } finally {
+    button.disabled = false;
+  }
+}
+
+ 
+async function loadGuestbookEntries() {
+  const list = document.getElementById("guestbookList");
+
+  if (!list) return;
+
+  list.textContent = "방명록을 불러오는 중입니다.";
+
+  try {
+    const { data: entries, error } =
+      await window.gomgaeSupabase
+        .from("guestbook_entries")
+        .select("id, created_at, author_name, is_anonymous, message")
+        .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    list.replaceChildren();
+
+    if (!entries || entries.length === 0) {
+      list.textContent = "아직 등록된 방문 기록이 없습니다.";
+      return;
+    }
+
+    entries.forEach(entry => {
+      const card = document.createElement("article");
+      card.className = "profile-card";
+      card.style.marginBottom = "16px";
+
+      const header = document.createElement("div");
+      header.style.display = "flex";
+      header.style.justifyContent = "space-between";
+      header.style.flexWrap = "wrap";
+      header.style.gap = "8px";
+
+      const author = document.createElement("strong");
+      author.textContent =
+        entry.is_anonymous
+          ? "익명의 방문자"
+          : (entry.author_name || "이름 없는 방문자");
+
+      const date = document.createElement("small");
+      date.textContent =
+        new Date(entry.created_at).toLocaleString("ko-KR");
+
+      const message = document.createElement("p");
+      message.style.whiteSpace = "pre-wrap";
+      message.style.marginTop = "16px";
+      message.textContent = entry.message;
+
+      header.append(author, date);
+      card.append(header, message);
+      list.appendChild(card);
+    });
+
+  } catch (error) {
+    console.error("Guestbook loading error:", error);
+    list.textContent =
+      "방명록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.";
+  }
+}
+
+ 
 // 방명록 등록하기
 async function submitVisitorLog() {
   const input = document.getElementById("visitorLogMessage");
