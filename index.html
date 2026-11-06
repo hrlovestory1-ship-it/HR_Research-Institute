@@ -2264,7 +2264,7 @@ async function loadResearcherDirectory() {
 
       const info = document.createElement("p");
       info.textContent =
-        `${researcher.researcher_number} · ${researcher.position || "직책 미등록"} · ${researcher.role || "역할 미등록"}`;
+        `${researcher.researcher_number} · ${researcher.position || "연구원"} · ${researcher.role || "역할 미등록"}`;
 
       const status = document.createElement("p");
       status.textContent = researcher.is_active ? "활동 중" : "비활동";
