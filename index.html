@@ -498,9 +498,9 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
 
       <article class="profile-card">
         <h3>MY ACTIVITY</h3>
-        <p>작성한 게시글 : 00</p>
-        <p>작성한 댓글 : 00</p>
-        <p>등록한 관찰일지 : 00</p>
+<p>작성한 게시글 : <span id="myPostCount">0</span></p>
+<p>작성한 댓글 : <span id="myCommentCount">0</span></p>
+<p>등록한 관찰일지 : <span id="myVisitorLogCount">0</span></p>
         <p>최근 접속 : 준비 중</p>
       </article>
     </div>
@@ -804,6 +804,52 @@ async function logoutResearcher() {
 
 // 마이페이지 정보 표시
 // 마이페이지 정보 표시
+ // 마이페이지 활동 횟수 불러오기
+async function loadMyActivityCounts(researcherNumber) {
+  const postCount = document.getElementById("myPostCount");
+  const commentCount = document.getElementById("myCommentCount");
+  const visitorLogCount = document.getElementById("myVisitorLogCount");
+
+  if (!researcherNumber) return;
+
+  try {
+    if (postCount) postCount.textContent = "조회 중";
+    if (commentCount) commentCount.textContent = "조회 중";
+    if (visitorLogCount) visitorLogCount.textContent = "조회 중";
+
+    const [posts, comments, logs] = await Promise.all([
+      window.gomgaeSupabase
+        .from("community_posts")
+        .select("researcher_number", { count: "exact", head: true })
+        .eq("researcher_number", researcherNumber),
+
+      window.gomgaeSupabase
+        .from("community_comments")
+        .select("researcher_number", { count: "exact", head: true })
+        .eq("researcher_number", researcherNumber),
+
+      window.gomgaeSupabase
+        .from("visitor_logs")
+        .select("researcher_number", { count: "exact", head: true })
+        .eq("researcher_number", researcherNumber)
+    ]);
+
+    if (posts.error) throw posts.error;
+    if (comments.error) throw comments.error;
+    if (logs.error) throw logs.error;
+
+    if (postCount) postCount.textContent = posts.count ?? 0;
+    if (commentCount) commentCount.textContent = comments.count ?? 0;
+    if (visitorLogCount) visitorLogCount.textContent = logs.count ?? 0;
+
+  } catch (error) {
+    console.error("My activity count error:", error);
+
+    if (postCount) postCount.textContent = "조회 실패";
+    if (commentCount) commentCount.textContent = "조회 실패";
+    if (visitorLogCount) visitorLogCount.textContent = "조회 실패";
+  }
+}
 function updateMyPage(researcher) {
   const number = document.getElementById("myResearcherNumber");
   const name = document.getElementById("myResearcherName");
@@ -826,6 +872,9 @@ function updateMyPage(researcher) {
     name.textContent = researcher.researcher_name || "미등록";
   }
 
+ // 마이페이지 활동 횟수 불러오기
+loadMyActivityCounts(researcher.researcher_number);
+ 
   if (position) {
     position.textContent = researcher.position || "미등록";
   }
