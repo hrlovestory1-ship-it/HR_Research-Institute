@@ -2231,6 +2231,55 @@ loadCommunityComments(post.id, commentList);
 
 
 // 게시글 등록 버튼 연결
+ // 연구원 명단 불러오기
+async function loadResearcherDirectory() {
+  const list = document.getElementById("researcherDirectoryList");
+
+  if (!list) return;
+
+  list.textContent = "연구원 정보를 불러오는 중입니다...";
+
+  try {
+    const { data, error } = await window.gomgaeSupabase
+      .from("researchers")
+      .select("researcher_number, researcher_name, position, role, is_active")
+      .order("researcher_number", { ascending: true });
+
+    if (error) throw error;
+
+    list.innerHTML = "";
+
+    if (!data || data.length === 0) {
+      list.textContent = "등록된 연구원이 없습니다.";
+      return;
+    }
+
+    data.forEach(researcher => {
+      const card = document.createElement("div");
+      card.className = "panel";
+      card.style.marginBottom = "12px";
+
+      const name = document.createElement("h3");
+      name.textContent = researcher.researcher_name || "이름 미등록";
+
+      const info = document.createElement("p");
+      info.textContent =
+        `${researcher.researcher_number} · ${researcher.position || "직책 미등록"} · ${researcher.role || "역할 미등록"}`;
+
+      const status = document.createElement("p");
+      status.textContent = researcher.is_active ? "활동 중" : "비활동";
+
+      card.appendChild(name);
+      card.appendChild(info);
+      card.appendChild(status);
+      list.appendChild(card);
+    });
+
+  } catch (error) {
+    console.error("Researcher directory error:", error);
+    list.textContent = "연구원 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.";
+  }
+}
 document.addEventListener("DOMContentLoaded", () => {
    // 게시글 검색창 연결
   const communitySearchInput =
@@ -2270,8 +2319,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
  
 // 페이지 로딩 시 로그인 상태 복원
-restoreResearcherAccess();
-
+restoreResearcherAccess().then(() => {
+  loadResearcherDirectory();
+});
 </script>
 
 </body>
