@@ -201,6 +201,40 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
     font-size: 9px;
   }
 }
+
+ .calendar-navigation {
+  display: grid;
+  grid-template-columns: 110px 1fr 110px;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.calendar-navigation h3 {
+  margin: 0;
+  text-align: center;
+  white-space: nowrap;
+  font-size: 20px;
+}
+
+.calendar-navigation button {
+  white-space: nowrap;
+  padding: 9px 10px;
+  font-size: 12px;
+}
+
+@media (max-width: 480px) {
+  .calendar-navigation {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .calendar-navigation h3 {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+}
+ 
 </style>
 </head>
 <body>
@@ -464,11 +498,11 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
  <div class="form-preview" style="margin-top:14px">
   <h3 style="font:600 15px var(--serif)">RESEARCH CALENDAR</h3>
 
-  <div style="display:flex; justify-content:space-between; align-items:center; margin:16px 0">
-   <button class="dark-action" onclick="changeCalendarMonth(-1)">← 이전 달</button>
-   <h3 id="calendarMonthTitle"></h3>
-   <button class="dark-action" onclick="changeCalendarMonth(1)">다음 달 →</button>
-  </div>
+<div class="calendar-navigation">
+  <button class="dark-action" onclick="changeCalendarMonth(-1)">← 이전 달</button>
+  <h3 id="calendarMonthTitle"></h3>
+  <button class="dark-action" onclick="changeCalendarMonth(1)">다음 달 →</button>
+</div>
 
   <div id="researchCalendar" class="calendar-grid"></div>
  </div>
