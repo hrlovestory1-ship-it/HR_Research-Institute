@@ -142,6 +142,65 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
  .observation-card{grid-template-columns:1fr}.observation-art{min-height:130px}.community-layout{grid-template-columns:1fr}.category-list{display:grid;grid-template-columns:repeat(2,1fr)}
  .post{grid-template-columns:65px 1fr}.post small{display:none}.board-large{grid-template-columns:1fr 1fr}.report-preview{grid-template-columns:1fr 1fr}
 }
+ /* RESEARCH SCHEDULE CALENDAR */
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 18px;
+}
+
+.calendar-weekday {
+  text-align: center;
+  padding: 10px 2px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted, #777);
+  border-bottom: 1px solid var(--line, #ddd);
+}
+
+.calendar-day {
+  min-height: 75px;
+  padding: 8px 5px;
+  border: 1px solid var(--line, #ddd);
+  background: var(--card, #fff);
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.calendar-day b {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.calendar-day small {
+  display: block;
+  font-size: 10px;
+  color: #8b7048;
+  line-height: 1.4;
+}
+
+.calendar-day.has-event {
+  border: 1px solid #a58a62;
+  background: rgba(165, 138, 98, 0.09);
+}
+
+@media (max-width: 600px) {
+  .calendar-grid {
+    gap: 3px;
+  }
+
+  .calendar-day {
+    min-height: 58px;
+    padding: 6px 2px;
+    font-size: 11px;
+  }
+
+  .calendar-day small {
+    font-size: 9px;
+  }
+}
 </style>
 </head>
 <body>
@@ -159,7 +218,21 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
   <button data-page="evidence" onclick="showPage('evidence',this)"><span class="nav-icon">⌘</span><span class="nav-copy"><b>EVIDENCE BOARD</b><small>증거 연결판</small></span></button>
   <button data-page="daily" onclick="showPage('daily',this)"><span class="nav-icon">▣</span><span class="nav-copy"><b>DAILY OBSERVATION</b><small>오늘의 관찰일지</small></span></button>
   <button data-page="reports" onclick="showPage('reports',this)"><span class="nav-icon">▤</span><span class="nav-copy"><b>MONTHLY REPORT</b><small>월간 연구 보고서</small></span></button>
+  <button data-page="schedule" onclick="showPage('schedule',this)">
+  <span class="nav-icon">▦</span>
+  <span class="nav-copy">
+    <b>RESEARCH SCHEDULE</b>
+    <small>연구소 일정 관리</small>
+  </span>
+</button>
   <button data-page="conference" onclick="showPage('conference',this)"><span class="nav-icon">♧</span><span class="nav-copy"><b>CONFERENCE</b><small>연구 회의실</small></span></button>
+  <button data-page="schedule" onclick="showPage('schedule',this)">
+  <span class="nav-icon">▦</span>
+  <span class="nav-copy">
+    <b>RESEARCH SCHEDULE</b>
+    <small>연구소 일정 관리</small>
+  </span>
+</button>
   <button data-page="community" onclick="showPage('community',this)"><span class="nav-icon">☏</span><span class="nav-copy"><b>COMMUNITY</b><small>연구원 커뮤니티</small></span></button>
   <button data-page="log" onclick="showPage('log',this)"><span class="nav-icon">▧</span><span class="nav-copy"><b>RESEARCH LOG</b><small>연구원 방문 기록</small></span></button>
   <button data-page="researchers" onclick="showPage('researchers',this)">
@@ -374,6 +447,65 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
  </div>
 </section>
 
+ <!-- RESEARCH SCHEDULE -->
+<section class="page" id="page-schedule">
+ <div class="section-head">
+  <div>
+   <div class="section-no">09 / RESEARCH SCHEDULE</div>
+   <h2>연구소 일정</h2>
+   <p>RESEARCH EVENTS · IMPORTANT DATES</p>
+  </div>
+ </div>
+
+ <div class="preview-warning">
+  연구소의 주요 일정과 연구원 참여 행사를 확인할 수 있는 일정 관리 공간입니다.
+ </div>
+
+ <div class="form-preview" style="margin-top:14px">
+  <h3 style="font:600 15px var(--serif)">RESEARCH CALENDAR</h3>
+
+  <div style="display:flex; justify-content:space-between; align-items:center; margin:16px 0">
+   <button class="dark-action" onclick="changeCalendarMonth(-1)">← 이전 달</button>
+   <h3 id="calendarMonthTitle"></h3>
+   <button class="dark-action" onclick="changeCalendarMonth(1)">다음 달 →</button>
+  </div>
+
+  <div id="researchCalendar" class="calendar-grid"></div>
+ </div>
+
+ <div class="form-preview" id="scheduleAdminPanel" style="margin-top:14px; display:none">
+  <h3 style="font:600 15px var(--serif)">NEW RESEARCH EVENT</h3>
+
+  <label>일정 제목</label>
+  <input id="eventTitle" type="text" placeholder="일정 제목을 입력하세요.">
+
+  <label>일정 설명</label>
+  <textarea id="eventDescription" rows="3" placeholder="일정 내용을 입력하세요."></textarea>
+
+  <label>날짜</label>
+  <input id="eventDate" type="date">
+
+  <label>시작 시간</label>
+  <input id="eventStartTime" type="time">
+
+  <label>종료 시간</label>
+  <input id="eventEndTime" type="time">
+
+  <label>분류</label>
+  <select id="eventCategory">
+   <option value="회의">회의</option>
+   <option value="행사">행사</option>
+   <option value="공지">공지</option>
+   <option value="기타">기타</option>
+  </select>
+
+  <button class="dark-action" onclick="createResearchEvent()">일정 등록 →</button>
+  <p id="eventFormStatus"></p>
+ </div>
+
+ <div id="researchEventList" style="margin-top:20px"></div>
+</section>
+ 
 <!-- COMMUNITY -->
 <section class="page" id="page-community">
  <div class="section-head"><div><div class="section-no">09 / RESEARCHER COMMUNITY</div><h2>연구원 커뮤니티</h2><p>DISCUSSION · INFORMATION · NOTICE</p></div></div>
@@ -770,6 +902,11 @@ if (id === "guestbook") {
   loadGuestbookEntries();
   updateGuestbookForm();
 }
+
+ // RESEARCH SCHEDULE 페이지를 열면 일정 불러오기
+if (id === "schedule") {
+  loadResearchEvents();
+}
  
   document.querySelectorAll(".nav button").forEach(b => {
     b.classList.remove("active");
@@ -868,6 +1005,216 @@ async function loadResearcherProfile() {
   return researcher;
 }
 
+ // ==============================
+// RESEARCH SCHEDULE
+// ==============================
+
+let researchCalendarDate = new Date();
+let researchCalendarEvents = [];
+
+// 날짜를 YYYY-MM-DD 형식으로 변환
+function getCalendarDateString(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+// 캘린더 월 이동
+function changeCalendarMonth(amount) {
+  researchCalendarDate.setMonth(
+    researchCalendarDate.getMonth() + amount
+  );
+
+  renderResearchCalendar();
+}
+
+// 일정 불러오기
+async function loadResearchEvents() {
+  const calendar = document.getElementById("researchCalendar");
+  const adminPanel = document.getElementById("scheduleAdminPanel");
+  const eventList = document.getElementById("researchEventList");
+
+  if (!calendar) return;
+
+  try {
+    const { data, error } = await window.gomgaeSupabase
+      .from("research_events")
+      .select("*")
+      .order("event_date", { ascending: true });
+
+    if (error) throw error;
+
+    researchCalendarEvents = data || [];
+
+    let researcher = null;
+
+    try {
+      researcher = await loadResearcherProfile();
+    } catch (e) {
+      researcher = null;
+    }
+
+    if (adminPanel) {
+      adminPanel.style.display =
+        researcher?.role === "ADMIN" ? "block" : "none";
+    }
+
+    renderResearchCalendar();
+    renderResearchEventList();
+
+  } catch (error) {
+    console.error("일정 불러오기 오류:", error);
+    calendar.textContent = "일정을 불러오지 못했습니다.";
+  }
+}
+
+// 캘린더 화면 그리기
+function renderResearchCalendar() {
+  const calendar = document.getElementById("researchCalendar");
+  const title = document.getElementById("calendarMonthTitle");
+
+  if (!calendar || !title) return;
+
+  const year = researchCalendarDate.getFullYear();
+  const month = researchCalendarDate.getMonth();
+
+  title.textContent = `${year}년 ${month + 1}월`;
+
+  calendar.innerHTML = "";
+
+  ["일", "월", "화", "수", "목", "금", "토"].forEach(day => {
+    const cell = document.createElement("div");
+    cell.textContent = day;
+    cell.className = "calendar-weekday";
+    calendar.appendChild(cell);
+  });
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const lastDate = new Date(year, month + 1, 0).getDate();
+
+  for (let i = 0; i < firstDay; i++) {
+    calendar.appendChild(document.createElement("div"));
+  }
+
+  for (let day = 1; day <= lastDate; day++) {
+    const dateString = getCalendarDateString(
+      new Date(year, month, day)
+    );
+
+    const dayEvents = researchCalendarEvents.filter(
+      event => event.event_date === dateString
+    );
+
+    const cell = document.createElement("div");
+    cell.className = "calendar-day";
+
+    const number = document.createElement("b");
+    number.textContent = day;
+    cell.appendChild(number);
+
+    if (dayEvents.length > 0) {
+      const mark = document.createElement("small");
+      mark.textContent = `일정 ${dayEvents.length}건`;
+      cell.appendChild(mark);
+      cell.classList.add("has-event");
+    }
+
+    calendar.appendChild(cell);
+  }
+}
+
+// 일정 목록 표시
+function renderResearchEventList() {
+  const list = document.getElementById("researchEventList");
+
+  if (!list) return;
+
+  list.innerHTML = "<h3>UPCOMING RESEARCH EVENTS</h3>";
+
+  if (researchCalendarEvents.length === 0) {
+    list.textContent = "등록된 일정이 없습니다.";
+    return;
+  }
+
+  researchCalendarEvents.forEach(event => {
+    const item = document.createElement("div");
+    item.className = "form-preview";
+    item.style.marginBottom = "10px";
+
+    const heading = document.createElement("h3");
+    heading.textContent = event.title;
+
+    const date = document.createElement("p");
+    date.textContent =
+      `${event.event_date} · ${event.category}`;
+
+    const description = document.createElement("p");
+    description.textContent = event.description || "";
+
+    const time = document.createElement("p");
+    time.textContent =
+      event.start_time
+        ? `${event.start_time.slice(0, 5)}${event.end_time ? " - " + event.end_time.slice(0, 5) : ""}`
+        : "시간 미정";
+
+    item.append(heading, date, time, description);
+    list.appendChild(item);
+  });
+}
+
+// 일정 등록
+async function createResearchEvent() {
+  const status = document.getElementById("eventFormStatus");
+
+  try {
+    const researcher = await loadResearcherProfile();
+
+    if (researcher.role !== "ADMIN") {
+      throw new Error("관리자만 일정을 등록할 수 있습니다.");
+    }
+
+    const title = document.getElementById("eventTitle").value.trim();
+    const description = document.getElementById("eventDescription").value.trim();
+    const eventDate = document.getElementById("eventDate").value;
+    const startTime = document.getElementById("eventStartTime").value || null;
+    const endTime = document.getElementById("eventEndTime").value || null;
+    const category = document.getElementById("eventCategory").value;
+
+    if (!title || !eventDate) {
+      throw new Error("일정 제목과 날짜를 입력해 주세요.");
+    }
+
+    const { error } = await window.gomgaeSupabase
+      .from("research_events")
+      .insert({
+        title,
+        description,
+        event_date: eventDate,
+        start_time: startTime,
+        end_time: endTime,
+        category
+      });
+
+    if (error) throw error;
+
+    status.textContent = "일정이 등록되었습니다.";
+
+    document.getElementById("eventTitle").value = "";
+    document.getElementById("eventDescription").value = "";
+    document.getElementById("eventDate").value = "";
+    document.getElementById("eventStartTime").value = "";
+    document.getElementById("eventEndTime").value = "";
+
+    await loadResearchEvents();
+
+  } catch (error) {
+    console.error("일정 등록 오류:", error);
+    status.textContent = error.message || "일정 등록에 실패했습니다.";
+  }
+}
+ 
 // 상단 로그인 버튼 정보 변경
 function updateResearcherButton(researcher) {
   const button = document.getElementById(
