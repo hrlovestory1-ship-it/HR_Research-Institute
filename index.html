@@ -243,15 +243,12 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
 }
 
 .calendar-day-heart {
-  position: absolute;
-  top: 2px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 42px;
+  display: inline-block;
+  margin-left: 4px;
+  font-size: 11px;
   line-height: 1;
-  color: rgba(190, 105, 125, 0.28);
-  z-index: 0;
-  pointer-events: none;
+  color: #bd7180;
+  vertical-align: middle;
 }
 
 .calendar-day-number {
@@ -553,24 +550,21 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
   <label>종료 시간</label>
   <input id="eventEndTime" type="time">
 
-  <label>분류</label>
-  <select id="eventCategory">
-   <label style="display:flex; align-items:center; gap:8px; margin:14px 0;">
+<label>분류</label>
+<select id="eventCategory">
+  <option value="회의">회의</option>
+  <option value="행사">행사</option>
+  <option value="공지">공지</option>
+  <option value="기타">기타</option>
+</select>
+
+<label style="display:flex; align-items:center; gap:8px; margin:14px 0;">
   <input type="checkbox" id="eventIsImportant">
   <span>♥ 중요 일정으로 지정</span>
 </label>
-   <option value="회의">회의</option>
-   <option value="행사">행사</option>
-   <option value="공지">공지</option>
-   <option value="기타">기타</option>
-  </select>
 
-  <button class="dark-action" onclick="createResearchEvent()">일정 등록 →</button>
-  <p id="eventFormStatus"></p>
- </div>
-
- <div id="researchEventList" style="margin-top:20px"></div>
-</section>
+<button class="dark-action" onclick="createResearchEvent()">일정 등록 →</button>
+<p id="eventFormStatus"></p>
  
 <!-- COMMUNITY -->
 <section class="page" id="page-community">
@@ -1188,7 +1182,7 @@ if (isImportant) {
   const heart = document.createElement("span");
   heart.className = "calendar-day-heart";
   heart.textContent = "♥";
-  cell.appendChild(heart);
+  number.appendChild(heart);
 }
 
 cell.appendChild(number);
