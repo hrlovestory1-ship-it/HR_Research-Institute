@@ -995,6 +995,11 @@ if (id === "guestbook") {
 if (id === "schedule") {
   loadResearchEvents();
 }
+
+ // MY PAGE 페이지를 열면 연구원 정보 불러오기
+if (id === "mypage") {
+  loadMyPage();
+}
  
   document.querySelectorAll(".nav button").forEach(b => {
     b.classList.remove("active");
@@ -1091,6 +1096,59 @@ async function loadResearcherProfile() {
   }
 
   return researcher;
+}
+
+ // ==============================
+// MY PAGE
+// ==============================
+
+async function loadMyPage() {
+  const loginNotice = document.getElementById("myPageLoginNotice");
+  const normalContent = document.getElementById("myPageNormalContent");
+  const passwordPanel = document.getElementById("passwordChangePanel");
+  const adminPanel = document.getElementById("adminResearcherPanel");
+
+  try {
+    const researcher = await loadResearcherProfile();
+
+    loginNotice.style.display = "none";
+
+    document.getElementById("myResearcherNumber").textContent =
+      researcher.researcher_number;
+
+    document.getElementById("myResearcherName").textContent =
+      researcher.researcher_name || "미등록";
+
+    document.getElementById("myResearcherPosition").textContent =
+      researcher.position || "미등록";
+
+    document.getElementById("myResearcherRole").textContent =
+      researcher.role;
+
+    document.getElementById("myResearcherStatus").textContent =
+      researcher.is_active ? "활성" : "비활성";
+
+    document.getElementById("nicknameInput").value =
+      researcher.researcher_name || "";
+
+    const mustChange = researcher.must_change_password === true;
+
+    passwordPanel.style.display = mustChange ? "block" : "none";
+    normalContent.style.display = mustChange ? "none" : "block";
+
+    adminPanel.style.display =
+      researcher.role === "ADMIN" && !mustChange ? "block" : "none";
+
+  } catch (error) {
+    console.error("마이페이지 불러오기 오류:", error);
+
+    loginNotice.style.display = "block";
+    normalContent.style.display = "none";
+    passwordPanel.style.display = "none";
+
+    loginNotice.textContent =
+      "로그인 후 연구원 개인 정보를 확인할 수 있습니다.";
+  }
 }
 
  // ==============================
