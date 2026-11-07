@@ -259,6 +259,20 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
   font-size: 14px;
   color: var(--text, #333);
 }
+
+ .calendar-event-title {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  padding: 3px 4px;
+  box-sizing: border-box;
+  border-radius: 3px;
+  background: rgba(165, 138, 98, 0.12);
+  color: var(--text, #555);
+  font-size: 10px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
  
 </style>
 </head>
@@ -1187,27 +1201,43 @@ if (isImportant) {
 
 cell.appendChild(number);
 
-    if (dayEvents.length > 0) {
-      const mark = document.createElement("small");
-      mark.textContent = `일정 ${dayEvents.length}건`;
-      cell.appendChild(mark);
-      cell.classList.add("has-event");
-    }
+if (dayEvents.length > 0) {
+  cell.classList.add("has-event");
+
+  dayEvents.forEach(event => {
+    const mark = document.createElement("small");
+    mark.className = "calendar-event-title";
+    mark.textContent = event.title;
+    mark.title = event.title;
+    cell.appendChild(mark);
+  });
+}
 
     calendar.appendChild(cell);
   }
 }
 
 // 일정 목록 표시
-function renderResearchEventList() {
+async function renderResearchEventList() {
   const list = document.getElementById("researchEventList");
 
   if (!list) return;
 
   list.innerHTML = "<h3>UPCOMING RESEARCH EVENTS</h3>";
 
+  let isAdmin = false;
+
+  try {
+    const researcher = await loadResearcherProfile();
+    isAdmin = researcher.role === "ADMIN";
+  } catch (error) {
+    isAdmin = false;
+  }
+
   if (researchCalendarEvents.length === 0) {
-    list.textContent = "등록된 일정이 없습니다.";
+    const empty = document.createElement("p");
+    empty.textContent = "등록된 일정이 없습니다.";
+    list.appendChild(empty);
     return;
   }
 
@@ -1233,6 +1263,18 @@ function renderResearchEventList() {
         : "시간 미정";
 
     item.append(heading, date, time, description);
+
+    if (isAdmin) {
+      const deleteButton = document.createElement("button");
+      deleteButton.className = "dark-action";
+      deleteButton.textContent = "일정 삭제";
+      deleteButton.addEventListener("click", () => {
+        deleteResearchEvent(event.id);
+      });
+
+      item.appendChild(deleteButton);
+    }
+
     list.appendChild(item);
   });
 }
