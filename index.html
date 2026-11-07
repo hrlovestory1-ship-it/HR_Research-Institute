@@ -234,6 +234,34 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
     grid-row: 1;
   }
 }
+
+ /* IMPORTANT EVENT HEART */
+
+.calendar-day {
+  position: relative;
+  align-items: center;
+}
+
+.calendar-day-heart {
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 42px;
+  line-height: 1;
+  color: rgba(190, 105, 125, 0.28);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.calendar-day-number {
+  position: relative;
+  z-index: 1;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: var(--text, #333);
+}
  
 </style>
 </head>
@@ -527,6 +555,10 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
 
   <label>분류</label>
   <select id="eventCategory">
+   <label style="display:flex; align-items:center; gap:8px; margin:14px 0;">
+  <input type="checkbox" id="eventIsImportant">
+  <span>♥ 중요 일정으로 지정</span>
+</label>
    <option value="회의">회의</option>
    <option value="행사">행사</option>
    <option value="공지">공지</option>
@@ -1144,9 +1176,22 @@ function renderResearchCalendar() {
     const cell = document.createElement("div");
     cell.className = "calendar-day";
 
-    const number = document.createElement("b");
-    number.textContent = day;
-    cell.appendChild(number);
+const isImportant = dayEvents.some(
+  event => event.is_important === true
+);
+
+const number = document.createElement("b");
+number.className = "calendar-day-number";
+number.textContent = day;
+
+if (isImportant) {
+  const heart = document.createElement("span");
+  heart.className = "calendar-day-heart";
+  heart.textContent = "♥";
+  cell.appendChild(heart);
+}
+
+cell.appendChild(number);
 
     if (dayEvents.length > 0) {
       const mark = document.createElement("small");
@@ -1215,6 +1260,7 @@ async function createResearchEvent() {
     const startTime = document.getElementById("eventStartTime").value || null;
     const endTime = document.getElementById("eventEndTime").value || null;
     const category = document.getElementById("eventCategory").value;
+   const isImportant = document.getElementById("eventIsImportant").checked;
 
     if (!title || !eventDate) {
       throw new Error("일정 제목과 날짜를 입력해 주세요.");
@@ -1222,14 +1268,15 @@ async function createResearchEvent() {
 
     const { error } = await window.gomgaeSupabase
       .from("research_events")
-      .insert({
-        title,
-        description,
-        event_date: eventDate,
-        start_time: startTime,
-        end_time: endTime,
-        category
-      });
+.insert({
+  title,
+  description,
+  event_date: eventDate,
+  start_time: startTime,
+  end_time: endTime,
+  category,
+  is_important: isImportant
+});
 
     if (error) throw error;
 
