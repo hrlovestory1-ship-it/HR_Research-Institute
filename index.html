@@ -1476,8 +1476,12 @@ async function updateGuestbookForm() {
   }
 
   try {
-    const { data: { user }, error } =
-      await window.gomgaeSupabase.auth.getUser();
+const { data: { session }, error } =
+  await window.gomgaeSupabase.auth.getSession();
+
+if (error) throw error;
+
+const user = session?.user ?? null;
 
     if (error) throw error;
 
@@ -1533,10 +1537,12 @@ async function submitGuestbookEntry() {
     button.disabled = true;
     status.textContent = "방문 기록을 등록하고 있습니다.";
 
-    const { data: { user }, error: userError } =
-      await window.gomgaeSupabase.auth.getUser();
+const { data: { session }, error: userError } =
+  await window.gomgaeSupabase.auth.getSession();
 
-    if (userError) throw userError;
+if (userError) throw userError;
+
+const user = session?.user ?? null;
 
     let authorName = null;
     let isAnonymous = false;
