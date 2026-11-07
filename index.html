@@ -8,6 +8,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Serif+KR:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+ .calendar-day {
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease,
+              transform 0.2s ease;
+}
+
+.calendar-day:hover {
+  background: rgba(165, 138, 98, 0.16);
+  border-color: #a58a62;
+  transform: translateY(-2px);
+}
 <style>
 :root{
  --ink:#242321;--ink2:#302e2a;--paper:#e9e4da;--paper2:#f1ede5;--paper3:#ddd5c8;
@@ -1088,6 +1099,7 @@ async function loadResearcherProfile() {
 
 let researchCalendarDate = new Date();
 let researchCalendarEvents = [];
+ let selectedResearchDate = null;
 
 // 날짜를 YYYY-MM-DD 형식으로 변환
 function getCalendarDateString(date) {
@@ -1186,6 +1198,12 @@ function renderResearchCalendar() {
 
     const cell = document.createElement("div");
     cell.className = "calendar-day";
+   cell.addEventListener("click", () => {
+  selectedResearchDate = dateString;
+
+  renderResearchCalendar();
+  renderResearchEventList();
+});
 
 const isImportant = dayEvents.some(
   event => event.is_important === true
@@ -1244,7 +1262,22 @@ async function renderResearchEventList() {
     return;
   }
 
-  researchCalendarEvents.forEach(event => {
+ const filteredEvents = selectedResearchDate
+  ? researchCalendarEvents.filter(
+      event => event.event_date === selectedResearchDate
+    )
+  : researchCalendarEvents;
+
+if (filteredEvents.length === 0) {
+  const empty = document.createElement("p");
+  empty.textContent = selectedResearchDate
+    ? "선택한 날짜에 등록된 일정이 없습니다."
+    : "등록된 일정이 없습니다.";
+  list.appendChild(empty);
+  return;
+}
+
+filteredEvents.forEach(event => {
     const item = document.createElement("div");
     item.className = "form-preview";
     item.style.marginBottom = "10px";
