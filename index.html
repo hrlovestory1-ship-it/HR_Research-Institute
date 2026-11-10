@@ -1028,7 +1028,16 @@ if (id === "schedule") {
 if (id === "mypage") {
   loadMyPage();
 }
- 
+
+  // 연구원 페이지 방문 기록 저장
+if (currentResearcherProfile) {
+  saveResearchActivity(
+    "PAGE_VISIT",
+    id + " 페이지 방문",
+    id
+  );
+}
+  
   document.querySelectorAll(".nav button").forEach(b => {
     b.classList.remove("active");
   });
@@ -1126,6 +1135,33 @@ async function loadResearcherProfile() {
   return researcher;
 }
 
+  // 연구원 활동 기록 저장
+async function saveResearchActivity(
+  eventType,
+  description,
+  pageName = null
+) {
+  try {
+    const researcher = currentResearcherProfile;
+
+    if (!researcher) return;
+
+    const { error } = await window.gomgaeSupabase
+      .from("research_activity_logs")
+      .insert({
+        researcher_number: researcher.researcher_number,
+        event_type: eventType,
+        page_name: pageName,
+        description: description
+      });
+
+    if (error) {
+      console.error("Activity log error:", error);
+    }
+  } catch (error) {
+    console.error("Activity log error:", error);
+  }
+}
  // ==============================
 // MY PAGE
 // ==============================
@@ -1506,6 +1542,13 @@ async function logoutResearcher() {
 
   if (!confirmed) return;
 
+  // 연구원 로그아웃 기록 저장
+await saveResearchActivity(
+  "LOGOUT",
+  "연구원 로그아웃",
+  "LOGOUT"
+);
+  
   const { error } =
     await window.gomgaeSupabase.auth.signOut();
 
@@ -1730,6 +1773,12 @@ async function loginResearcher() {
     updateResearchLogAccess(researcher);
     updateMyPage(researcher);
 
+    await saveResearchActivity(
+  "LOGIN",
+  "연구원 로그인",
+  "LOGIN"
+);
+    
     if (researcher.must_change_password) {
       alert("최초 로그인입니다. MY PAGE에서 비밀번호를 변경해 주세요.");
     } else {
@@ -2408,6 +2457,13 @@ async function submitCommunityPost() {
 
     if (error) throw error;
 
+    // 게시글 작성 활동 기록
+await saveResearchActivity(
+  "POST_CREATE",
+  "게시글 작성: " + title,
+  "COMMUNITY"
+);
+    
     titleInput.value = "";
     contentInput.value = "";
    document.getElementById("communityPostCategory").value = "자유 연구실";
