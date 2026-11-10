@@ -648,9 +648,7 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
 <!-- RESEARCH LOG -->
 <section class="page" id="page-log">
  <div class="section-head"><div><div class="section-no">10 / RESEARCH LOG</div><h2>연구원 방문 기록</h2><p>RESEARCHER GUESTBOOK</p></div></div>
- <div class="preview-warning">연구원 방명록입니다. 연구원 번호와 작성일은 실제 로그인 연동 후 자동 표시되며, 댓글·수정·삭제 기능도 데이터베이스 연결 후 활성화됩니다.</div>
- <div class="card-grid"><article class="info-card"><div class="card-meta"><span>HR-001</span><span>2026-11-04</span></div><h3>연구소 방문 기록을 남깁니다.</h3><p>오늘도 새로운 단서를 발견하기 위해 방문했습니다. 모든 순간을 기록하겠습니다.</p><p style="margin-top:10px">💬 댓글 2개 · 답글 보기</p></article><article class="info-card"><div class="card-meta"><span>HR-007</span><span>2026-11-03</span></div><h3>첫 번째 연구 회의 기대됩니다!</h3><p>다른 연구원분들과 다양한 의견을 나눌 수 있으면 좋겠습니다.</p><p style="margin-top:10px">💬 댓글 1개 · 답글 보기</p></article></div>
- <div class="form-preview" style="margin-top:14px"><h3 style="font:600 15px var(--serif)">LEAVE A MESSAGE</h3><label>방문 기록</label><textarea placeholder="연구소에 방문한 기록을 남겨주세요."></textarea><button class="dark-action" onclick="alert('방명록 등록 기능은 로그인 및 데이터베이스 연결 후 사용할 수 있습니다.')">방문 기록 남기기</button></div>
+
 </section>
 
 <!-- MY PAGE -->
@@ -1024,6 +1022,11 @@ if (id === "schedule") {
   loadResearchEvents();
 }
 
+  // RESEARCH LOG 페이지를 열면 활동 기록 불러오기
+if (id === "log") {
+  loadResearchActivityLogs();
+}
+
  // MY PAGE 페이지를 열면 연구원 정보 불러오기
 if (id === "mypage") {
   loadMyPage();
@@ -1162,6 +1165,86 @@ async function saveResearchActivity(
     console.error("Activity log error:", error);
   }
 }
+  
+// 연구원 활동 기록 불러오기
+async function loadResearchActivityLogs() {
+  const list = document.getElementById("researchActivityList");
+
+  if (!list) return;
+
+  list.innerHTML = `
+    <div class="preview-warning">
+      연구원 활동 기록을 불러오는 중입니다.
+    </div>
+  `;
+
+  try {
+    const { data, error } = await window.gomgaeSupabase
+      .from("research_activity_logs")
+      .select("id, researcher_number, event_type, page_name, description, created_at")
+      .order("created_at", { ascending: false })
+      .limit(100);
+
+    if (error) throw error;
+
+    list.innerHTML = "";
+
+    if (!data || data.length === 0) {
+      list.innerHTML = `
+        <div class="preview-warning">
+          아직 기록된 연구원 활동이 없습니다.
+        </div>
+      `;
+      return;
+    }
+
+    data.forEach((log) => {
+      const card = document.createElement("article");
+      card.className = "info-card";
+
+      const date = new Date(log.created_at);
+      const formattedDate = date.toLocaleString("ko-KR");
+
+      const meta = document.createElement("div");
+      meta.className = "card-meta";
+
+      const researcher = document.createElement("span");
+      researcher.textContent = log.researcher_number;
+
+      const time = document.createElement("span");
+      time.textContent = formattedDate;
+
+      meta.appendChild(researcher);
+      meta.appendChild(time);
+
+      const title = document.createElement("h3");
+      title.textContent = log.description || log.event_type;
+
+      const detail = document.createElement("p");
+      detail.textContent =
+        "활동 유형: " + log.event_type +
+        (log.page_name ? " · 페이지: " + log.page_name : "");
+
+      card.appendChild(meta);
+      card.appendChild(title);
+      card.appendChild(detail);
+
+      list.appendChild(card);
+    });
+
+  } catch (error) {
+    console.error("연구원 활동 기록 불러오기 오류:", error);
+
+    list.innerHTML = `
+      <div class="preview-warning">
+        활동 기록을 불러오지 못했습니다.
+        관리자 권한과 데이터베이스 연결을 확인해 주세요.
+      </div>
+    `;
+  }
+}
+
+  
  // ==============================
 // MY PAGE
 // ==============================
@@ -1459,6 +1542,13 @@ async function deleteResearchEvent(eventId) {
 
     if (error) throw error;
 
+    // 연구 일정 삭제 활동 기록
+await saveResearchActivity(
+  "SCHEDULE_DELETE",
+  "연구 일정 삭제",
+  "SCHEDULE"
+);
+    
     alert("일정이 삭제되었습니다.");
 
     await loadResearchEvents();
@@ -1505,6 +1595,13 @@ async function createResearchEvent() {
 });
 
     if (error) throw error;
+
+    // 연구 일정 등록 활동 기록
+await saveResearchActivity(
+  "SCHEDULE_CREATE",
+  "연구 일정 등록: " + title,
+  "SCHEDULE"
+);
 
     status.textContent = "일정이 등록되었습니다.";
 
@@ -2264,6 +2361,13 @@ const user = session?.user ?? null;
 
     if (error) throw error;
 
+    // 방명록 작성 활동 기록
+await saveResearchActivity(
+  "GUESTBOOK_CREATE",
+  "방명록 작성",
+  "GUESTBOOK"
+);
+    
     messageInput.value = "";
     nameInput.value = "";
     anonymousCheckbox.checked = false;
@@ -2395,6 +2499,13 @@ async function submitVisitorLog() {
 
     if (error) throw error;
 
+    // 방문 기록 작성 활동 기록
+await saveResearchActivity(
+  "VISITOR_LOG_CREATE",
+  "방문 기록 작성",
+  "VISITOR_LOG"
+);
+    
     input.value = "";
     status.textContent = "연구 기록이 등록되었습니다!";
 
@@ -2511,6 +2622,13 @@ async function editCommunityPost(postId, oldTitle, oldContent) {
 
     if (error) throw error;
 
+    // 게시글 수정 활동 기록
+await saveResearchActivity(
+  "POST_EDIT",
+  "게시글 수정",
+  "COMMUNITY"
+);
+    
     alert("게시글이 수정되었습니다!");
     await loadCommunityPosts();
 
@@ -2565,7 +2683,12 @@ async function submitCommunityComment(postId, input, parentCommentId = null) {
     if (error) throw error;
 
     input.value = "";
-
+// 댓글 및 답글 작성 활동 기록
+await saveResearchActivity(
+  "COMMENT_CREATE",
+  parentCommentId ? "답글 작성" : "댓글 작성",
+  "COMMUNITY"
+);
 const commentList = input.closest(".community-comments")
   .querySelector(".community-comment-list");
 
@@ -2930,6 +3053,13 @@ async function toggleCommunityReaction(postId, reactionType, container) {
       if (error) throw error;
     }
 
+    // 게시글 반응 활동 기록
+await saveResearchActivity(
+  "REACTION",
+  "게시글 반응: " + reactionType,
+  "COMMUNITY"
+);
+    
     // 반응 개수 새로고침
     await loadCommunityReactions(postId, container);
 
@@ -2959,7 +3089,12 @@ async function editCommunityComment(commentId, oldContent) {
       .eq("id", commentId);
 
     if (error) throw error;
-
+// 댓글 수정 활동 기록
+await saveResearchActivity(
+  "COMMENT_EDIT",
+  "댓글 수정",
+  "COMMUNITY"
+);
     alert("댓글이 수정되었습니다.");
     await loadCommunityPosts();
 
@@ -2980,7 +3115,14 @@ async function deleteCommunityComment(commentId) {
       .eq("id", commentId);
 
     if (error) throw error;
-
+    
+// 댓글 삭제 활동 기록
+await saveResearchActivity(
+  "COMMENT_DELETE",
+  "댓글 삭제",
+  "COMMUNITY"
+);
+    
     alert("댓글이 삭제되었습니다.");
     await loadCommunityPosts();
 
