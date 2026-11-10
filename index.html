@@ -314,7 +314,13 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
   </span>
 </button>
   <button data-page="community" onclick="showPage('community',this)"><span class="nav-icon">☏</span><span class="nav-copy"><b>COMMUNITY</b><small>연구원 커뮤니티</small></span></button>
-  <button data-page="log" onclick="showPage('log',this)"><span class="nav-icon">▧</span><span class="nav-copy"><b>RESEARCH LOG</b><small>연구원 방문 기록</small></span></button>
+ <button id="researchLogMenu" data-page="log" onclick="showPage('log',this)" style="display:none;">
+  <span class="nav-icon">▧</span>
+  <span class="nav-copy">
+    <b>RESEARCH LOG</b>
+    <small>연구원 방문 기록</small>
+  </span>
+</button>
   <button data-page="researchers" onclick="showPage('researchers',this)">
   <span class="nav-icon">♟</span>
   <span class="nav-copy">
@@ -938,8 +944,40 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
 </div>
 <script>
 
+  // 현재 로그인한 연구원 정보
+let currentResearcherProfile = null;
+
+// RESEARCH LOG 관리자 접근 권한 설정
+function updateResearchLogAccess(researcher) {
+  currentResearcherProfile = researcher || null;
+
+  const menu = document.getElementById("researchLogMenu");
+
+  if (!menu) return;
+
+  const isAdmin =
+    researcher &&
+    researcher.researcher_number === "HR-000" &&
+    researcher.role === "ADMIN" &&
+    researcher.must_change_password !== true;
+
+  menu.style.display = isAdmin ? "" : "none";
+}
+  
 // 페이지 전환
 function showPage(id, btn) {
+// RESEARCH LOG는 HR-000 관리자만 접근 가능
+if (
+  id === "log" &&
+  (
+    currentResearcherProfile?.researcher_number !== "HR-000" ||
+    currentResearcherProfile?.role !== "ADMIN" ||
+    currentResearcherProfile?.must_change_password === true
+  )
+) {
+  alert("관리자만 접근할 수 있습니다.");
+  return;
+}
   // 최초 비밀번호 변경 여부 확인
   const passwordPanel =
     document.getElementById("passwordChangePanel");
@@ -1476,7 +1514,10 @@ async function logoutResearcher() {
     console.error("Logout error:", error);
     return;
   }
-
+  
+// 관리자 권한 초기화
+updateResearchLogAccess(null);
+  
   const button = document.getElementById(
     "researcherAccessButton"
   );
@@ -1616,6 +1657,7 @@ async function restoreResearcherAccess() {
     const researcher = await loadResearcherProfile();
 
     updateResearcherButton(researcher);
+    updateResearchLogAccess(researcher);
     updateMyPage(researcher);
 
   } catch (error) {
@@ -1685,6 +1727,7 @@ async function loginResearcher() {
     }
 
     updateResearcherButton(researcher);
+    updateResearchLogAccess(researcher);
     updateMyPage(researcher);
 
     if (researcher.must_change_password) {
