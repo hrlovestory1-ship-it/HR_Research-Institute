@@ -1884,6 +1884,7 @@ async function restoreResearcherAccess() {
 
 
 // 연구원 로그인
+
 async function loginResearcher() {
   const researcherNumber = document
     .getElementById("researcherNumberInput")
@@ -1899,12 +1900,25 @@ async function loginResearcher() {
     return;
   }
 
-  
-if (!researcherTurnstileToken) {
-  alert("자동화 방지 인증을 완료해 주세요.");
-  return;
-}
+  if (!researcherTurnstileToken) {
+    alert("자동화 방지 인증을 완료해 주세요.");
+    return;
+  }
 
+  // 현재 인증 토큰 저장
+  const turnstileToken = researcherTurnstileToken;
+
+  // 인증 토큰 및 위젯 초기화
+  function resetResearcherTurnstile() {
+    researcherTurnstileToken = "";
+
+    if (
+      window.turnstile &&
+      researcherTurnstileWidgetId !== null
+    ) {
+      window.turnstile.reset(researcherTurnstileWidgetId);
+    }
+  }
 
   try {
     const response = await fetch(
@@ -1915,19 +1929,18 @@ if (!researcherTurnstileToken) {
           "Content-Type": "application/json",
           "apikey": "sb_publishable_m35n-HNZFCc9jzcTyg4szA_aRQv3XxN"
         },
-
-body: JSON.stringify({
-  researcher_number: researcherNumber,
-  password: password,
-  turnstile_token: researcherTurnstileToken
-})
-
+        body: JSON.stringify({
+          researcher_number: researcherNumber,
+          password: password,
+          turnstile_token: turnstileToken
+        })
       }
     );
 
     const result = await response.json();
 
     if (!response.ok || !result.success) {
+      resetResearcherTurnstile();
       alert(result.message || "로그인에 실패했습니다.");
       return;
     }
@@ -1939,6 +1952,7 @@ body: JSON.stringify({
       });
 
     if (error) {
+      resetResearcherTurnstile();
       alert("로그인 세션을 저장하지 못했습니다.");
       return;
     }
@@ -1958,11 +1972,11 @@ body: JSON.stringify({
     updateMyPage(researcher);
 
     await saveResearchActivity(
-  "LOGIN",
-  "연구원 로그인",
-  "LOGIN"
-);
-    
+      "LOGIN",
+      "연구원 로그인",
+      "LOGIN"
+    );
+
     if (researcher.must_change_password) {
       alert("최초 로그인입니다. MY PAGE에서 비밀번호를 변경해 주세요.");
     } else {
@@ -1973,9 +1987,11 @@ body: JSON.stringify({
 
   } catch (error) {
     console.error("Login error:", error);
+    resetResearcherTurnstile();
     alert("서버 연결에 실패했습니다. 잠시 후 다시 시도해 주세요.");
   }
 }
+
 
 
 // 최초 로그인 비밀번호 변경
