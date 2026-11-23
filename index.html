@@ -584,6 +584,96 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
   </div>
 </div>
 
+
+<!-- PUBLIC REPORT SUBMISSION -->
+<div style="
+  grid-column:1/-1;
+  border:1px solid #c8bfb1;
+  background:#e9e4da;
+  padding:20px;
+  margin-bottom:12px;
+">
+  <div style="font-family:Georgia,serif;font-size:20px;letter-spacing:2px;">
+    SUBMIT NEW REPORT
+  </div>
+  <p style="color:#777166;font-size:13px;">
+    RESEARCHER CONTRIBUTION / PUBLICATION
+  </p>
+
+  <button class="dark-action"
+    type="button"
+    onclick="
+      const form = document.getElementById('publicReportForm');
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    ">
+    + 새 연구 보고서 작성
+  </button>
+
+  <div id="publicReportForm" style="display:none;margin-top:20px;">
+
+    <label>보고서 제목</label>
+    <input id="newReportTitle" type="text" maxlength="120"
+      placeholder="보고서 제목을 입력해 주세요"
+      style="width:100%;padding:12px;margin:7px 0 15px;">
+
+    <label>작성자 별명</label>
+    <input id="newReportNickname" type="text" maxlength="30"
+      placeholder="연구원 별명을 입력해 주세요"
+      style="width:100%;padding:12px;margin:7px 0 15px;">
+
+    <label>연구 요약</label>
+    <textarea id="newReportSummary" rows="3"
+      placeholder="연구 내용을 간단히 요약해 주세요"
+      style="width:100%;padding:12px;margin:7px 0 15px;"></textarea>
+
+    <label>연구 개요</label>
+    <textarea id="newReportOverview" rows="5"
+      placeholder="관찰한 내용과 상황을 작성해 주세요"
+      style="width:100%;padding:12px;margin:7px 0 15px;"></textarea>
+
+    <label>상세 분석</label>
+    <textarea id="newReportAnalysis" rows="5"
+      placeholder="관찰 내용을 바탕으로 분석해 주세요"
+      style="width:100%;padding:12px;margin:7px 0 15px;"></textarea>
+
+    <label>최종 결론</label>
+    <textarea id="newReportConclusion" rows="4"
+      placeholder="연구를 통해 도출한 결론을 작성해 주세요"
+      style="width:100%;padding:12px;margin:7px 0 15px;"></textarea>
+
+    <label>관련 영상 링크</label>
+    <input id="newReportSource" type="url"
+      placeholder="https://youtu.be/..."
+      style="width:100%;padding:12px;margin:7px 0 15px;">
+
+    <label>영상 시작 시간 (초)</label>
+    <input id="newReportTimestamp" type="number" min="0"
+      placeholder="예: 175"
+      style="width:100%;padding:12px;margin:7px 0 15px;">
+
+    <label>관련 사진 첨부</label>
+    <input id="newReportPhotos" type="file"
+      accept="image/jpeg,image/png,image/webp"
+      multiple
+      style="display:block;margin:10px 0 20px;">
+
+    <div id="public-report-turnstile"
+      style="margin:18px 0;display:flex;justify-content:center;">
+    </div>
+
+    <p style="color:#777166;font-size:12px;">
+      ※ 제출된 보고서는 별도의 승인 없이 월간 연구 자료실에 공개됩니다.
+    </p>
+
+    <button type="button" class="dark-action" disabled>
+      제출 기능 연결 중
+    </button>
+
+  </div>
+</div>
+<!-- END PUBLIC REPORT SUBMISSION -->
+
+   
 <!-- OCTOBER -->
 <article class="info-card"
  data-year="2026"
