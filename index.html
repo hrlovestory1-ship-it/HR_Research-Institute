@@ -662,12 +662,29 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
   title="분:초 형식으로 입력해 주세요. 예: 02:55"
   style="width:100%;padding:12px;margin:7px 0 15px;">
 
-    <label>관련 사진 첨부</label>
-    <input id="newReportPhotos" type="file"
-      accept="image/jpeg,image/png,image/webp"
-      multiple
-      style="display:block;margin:10px 0 20px;">
+<label>관련 사진 첨부</label>
 
+<input id="newReportPhotos" type="file"
+  accept="image/jpeg,image/png,image/webp"
+  multiple
+  style="display:block;margin:10px 0 10px;">
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+  <span id="photoCount" style="font-size:12px;color:#777166;">
+    선택된 사진 없음
+  </span>
+
+  <button type="button"
+    class="dark-action"
+    onclick="clearReportPhotos()"
+    style="padding:7px 12px;font-size:12px;">
+    전체 선택 취소
+  </button>
+</div>
+
+<div id="reportPhotoPreview"
+  style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-bottom:20px;">
+</div>
     <div id="public-report-turnstile"
       style="margin:18px 0;display:flex;justify-content:center;">
     </div>
@@ -4834,6 +4851,87 @@ function filterMonthlyReports() {
 }
 </script>
 
+<script>
+  // 선택한 사진 미리보기
+function renderReportPhotoPreview() {
+  const input = document.getElementById("newReportPhotos");
+  const preview = document.getElementById("reportPhotoPreview");
+  const count = document.getElementById("photoCount");
+
+  const files = Array.from(input.files);
+
+  preview.innerHTML = "";
+  count.textContent = files.length
+    ? `선택된 사진 ${files.length}장`
+    : "선택된 사진 없음";
+
+  files.forEach((file, index) => {
+    const reader = new FileReader();
+
+    reader.onload = function(event) {
+      const item = document.createElement("div");
+
+      item.style.cssText =
+        "position:relative;border:1px solid #c8bfb1;padding:5px;background:#f1ede5;";
+
+      const image = document.createElement("img");
+      image.src = event.target.result;
+      image.style.cssText =
+        "width:100%;height:100px;object-fit:cover;display:block;";
+
+      const name = document.createElement("p");
+      name.textContent = file.name;
+      name.style.cssText =
+        "font-size:10px;color:#777166;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:5px 0;";
+
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.textContent = "사진 삭제";
+      remove.style.cssText =
+        "width:100%;padding:5px;border:1px solid #9a4438;background:transparent;color:#9a4438;cursor:pointer;font-size:11px;";
+
+      remove.onclick = function() {
+        removeReportPhoto(index);
+      };
+
+      item.appendChild(image);
+      item.appendChild(name);
+      item.appendChild(remove);
+      preview.appendChild(item);
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
+// 사진 선택 취소
+function clearReportPhotos() {
+  document.getElementById("newReportPhotos").value = "";
+  renderReportPhotoPreview();
+}
+
+// 선택한 사진 중 하나만 삭제
+function removeReportPhoto(index) {
+  const input = document.getElementById("newReportPhotos");
+  const files = Array.from(input.files);
+  const transfer = new DataTransfer();
+
+  files.forEach((file, i) => {
+    if (i !== index) {
+      transfer.items.add(file);
+    }
+  });
+
+  input.files = transfer.files;
+  renderReportPhotoPreview();
+}
+
+// 사진 선택 시 미리보기 갱신
+document.getElementById("newReportPhotos").addEventListener(
+  "change",
+  renderReportPhotoPreview
+);
+  
 async function submitPublicReport() {
   const title = document.getElementById("newReportTitle").value.trim();
   const nickname = document.getElementById("newReportNickname").value.trim();
