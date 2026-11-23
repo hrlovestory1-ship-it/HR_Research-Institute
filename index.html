@@ -4978,8 +4978,60 @@ async function submitPublicReport() {
   submitButton.textContent = "제출 중...";
 
   try {
-    const { data, error } =
-      await window.gomgaeSupabase.functions.invoke("submit-report", {
+const formData = new FormData();
+
+formData.append("turnstile_token", reportTurnstileToken);
+formData.append("title", title);
+formData.append("author_nickname", nickname);
+formData.append("summary", summary);
+formData.append("overview", overview);
+formData.append("analysis", analysis);
+formData.append("conclusion", conclusion);
+formData.append("source_url", sourceUrl);
+formData.append("source_timestamp", String(timestamp ?? ""));
+
+// 선택한 사진 함께 첨부
+const photoFiles = document.getElementById("newReportPhotos").files;
+
+for (const file of photoFiles) {
+  formData.append("photos", file);
+}
+
+const { data, error } =
+  await window.gomgaeSupabase.functions.invoke(
+    "submit-report",
+    {
+      body: formData
+    }
+  );
+
+if (error) throw error;
+
+if (!data || !data.success) {
+  throw new Error(
+    data?.message || "보고서 등록에 실패했습니다."
+  );
+}
+
+alert(
+  "보고서가 등록되었습니다!\n보고서 번호: " +
+  data.report_code +
+  "\n첨부 사진: " +
+  data.photo_count +
+  "장"
+);
+
+// 입력 내용 초기화
+document.getElementById("newReportTitle").value = "";
+document.getElementById("newReportNickname").value = "";
+document.getElementById("newReportSummary").value = "";
+document.getElementById("newReportOverview").value = "";
+document.getElementById("newReportAnalysis").value = "";
+document.getElementById("newReportConclusion").value = "";
+document.getElementById("newReportSource").value = "";
+document.getElementById("newReportTimestamp").value = "";
+
+clearReportPhotos();
         body: {
           turnstile_token: reportTurnstileToken,
           title,
