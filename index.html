@@ -759,6 +759,9 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
 
  </div>
 
+<!-- DYNAMIC REPORT DETAIL -->
+<div id="dynamicReportDetail" style="display:none;">
+</div>  
 
 <!-- OCTOBER REPORT DETAIL -->
 <div id="reportDetailOct" style="display:none;">
@@ -4852,6 +4855,212 @@ function filterMonthlyReports() {
 </script>
 
 <script>
+
+  
+// Supabase에 저장된 보고서 목록 불러오기
+async function loadMonthlyReports() {
+  const reportList = document.getElementById("reportList");
+
+  const { data, error } = await window.gomgaeSupabase
+    .from("monthly_reports")
+    .select("*")
+    .eq("published", true)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("보고서 목록 불러오기 오류:", error);
+    return;
+  }
+
+  // 기존에 불러온 동적 카드가 있다면 제거
+  reportList.querySelectorAll(".dynamic-report-card")
+    .forEach(card => card.remove());
+
+  data.forEach(report => {
+    const article = document.createElement("article");
+    article.className = "info-card dynamic-report-card";
+
+    const month = String(report.report_month).padStart(2, "0");
+
+    article.dataset.year = String(report.report_year);
+    article.dataset.month = month;
+    article.dataset.search = [
+      report.report_code,
+      report.title,
+      report.author_nickname,
+      report.summary
+    ].join(" ");
+
+    const cover = document.createElement("div");
+    cover.className = "report-cover";
+
+    const institute = document.createElement("small");
+    institute.textContent = "GOMGAE RESEARCH INSTITUTE";
+
+    const coverTitle = document.createElement("b");
+    coverTitle.innerHTML = "MONTHLY<br>REPORT";
+
+    const coverDate = document.createElement("small");
+    coverDate.textContent =
+      `${report.report_year} · ${month}`;
+
+    cover.append(institute, coverTitle, coverDate);
+
+    const meta = document.createElement("div");
+    meta.className = "card-meta";
+
+    const code = document.createElement("span");
+    code.textContent = report.report_code;
+
+    const date = document.createElement("span");
+    date.textContent = `${report.report_year}-${month}`;
+
+    meta.append(code, date);
+
+    const heading = document.createElement("h3");
+    heading.textContent = report.title;
+
+    const summary = document.createElement("p");
+    summary.textContent =
+      report.summary || "등록된 연구 요약이 없습니다.";
+
+    const author = document.createElement("small");
+    author.textContent = `RESEARCHER / ${report.author_nickname}`;
+
+    const button = document.createElement("button");
+    button.className = "dark-action";
+    button.type = "button";
+    button.textContent = "보고서 열람 →";
+    button.addEventListener("click", () => {
+      openDynamicReport(report);
+    });
+
+    article.append(
+      cover,
+      meta,
+      heading,
+      summary,
+      author,
+      button
+    );
+
+    reportList.appendChild(article);
+  });
+
+  filterMonthlyReports();
+}
+
+  
+// 새 보고서 상세 내용 열람
+function openDynamicReport(report) {
+  const reportList = document.getElementById("reportList");
+  const detail = document.getElementById("dynamicReportDetail");
+
+  detail.innerHTML = "";
+
+  const backButton = document.createElement("button");
+  backButton.className = "dark-action";
+  backButton.textContent = "← 보고서 목록으로";
+
+  backButton.addEventListener("click", () => {
+    detail.style.display = "none";
+    reportList.style.display = "grid";
+  });
+
+  detail.appendChild(backButton);
+
+  const heading = document.createElement("h2");
+  heading.textContent = report.title;
+  heading.style.cssText =
+    "margin:25px 0 10px;color:#242321;";
+
+  detail.appendChild(heading);
+
+  const meta = document.createElement("p");
+  meta.textContent =
+    `${report.report_code} · ${report.report_year}년 ${report.report_month}월 · 작성자 ${report.author_nickname}`;
+  meta.style.cssText =
+    "color:#777166;font-size:13px;margin-bottom:25px;";
+
+  detail.appendChild(meta);
+
+  function addReportSection(title, content) {
+    if (!content) return;
+
+    const section = document.createElement("section");
+    section.style.cssText =
+      "margin:22px 0;padding:18px;background:#f1ede5;border:1px solid #c8bfb1;";
+
+    const sectionTitle = document.createElement("h3");
+    sectionTitle.textContent = title;
+
+    const paragraph = document.createElement("p");
+    paragraph.textContent = content;
+    paragraph.style.cssText =
+      "white-space:pre-wrap;line-height:1.8;color:#302e2a;";
+
+    section.append(sectionTitle, paragraph);
+    detail.appendChild(section);
+  }
+
+  addReportSection("RESEARCH SUMMARY", report.summary);
+  addReportSection("RESEARCH OVERVIEW", report.overview);
+  addReportSection("DETAILED ANALYSIS", report.analysis);
+  addReportSection("FINAL CONCLUSION", report.conclusion);
+
+  // 관련 영상 링크
+  if (report.source_url) {
+    const videoSection = document.createElement("section");
+    videoSection.style.margin = "22px 0";
+
+    const videoTitle = document.createElement("h3");
+    videoTitle.textContent = "RELATED VIDEO";
+
+    const videoLink = document.createElement("a");
+    videoLink.href = report.source_url;
+    videoLink.target = "_blank";
+    videoLink.rel = "noopener noreferrer";
+    videoLink.textContent = "관련 영상 열기 →";
+    videoLink.style.color = "#80684f";
+
+    videoSection.append(videoTitle, videoLink);
+    detail.appendChild(videoSection);
+  }
+
+  // 첨부 사진
+  if (report.photo_urls && report.photo_urls.length > 0) {
+    const photoSection = document.createElement("section");
+    photoSection.style.margin = "22px 0";
+
+    const photoTitle = document.createElement("h3");
+    photoTitle.textContent = "ATTACHED EVIDENCE";
+
+    const photoGrid = document.createElement("div");
+    photoGrid.style.cssText =
+      "display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;";
+
+    report.photo_urls.forEach(url => {
+      const image = document.createElement("img");
+      image.src = url;
+      image.alt = "첨부된 연구 사진";
+      image.loading = "lazy";
+      image.style.cssText =
+        "width:100%;height:180px;object-fit:cover;border:1px solid #c8bfb1;";
+
+      photoGrid.appendChild(image);
+    });
+
+    photoSection.append(photoTitle, photoGrid);
+    detail.appendChild(photoSection);
+  }
+
+  reportList.style.display = "none";
+  detail.style.display = "block";
+}
+
+// 페이지가 열리면 보고서 목록 자동 불러오기
+loadMonthlyReports();
+
   // 선택한 사진 미리보기
 function renderReportPhotoPreview() {
   const input = document.getElementById("newReportPhotos");
@@ -5020,7 +5229,10 @@ alert(
   data.photo_count +
   "장"
 );
-
+    
+// 새 보고서를 목록에 즉시 반영
+await loadMonthlyReports();
+    
 // 입력 내용 초기화
 document.getElementById("newReportTitle").value = "";
 document.getElementById("newReportNickname").value = "";
