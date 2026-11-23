@@ -676,12 +676,14 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
       ※ 제출된 보고서는 별도의 승인 없이 월간 연구 자료실에 공개됩니다.
     </p>
 
-    <button type="button" class="dark-action" disabled>
-      제출 기능 연결 중
-    </button>
-
-  </div>
-</div>
+<button
+  type="button"
+  class="dark-action"
+  onclick="submitPublicReport()"
+>
+  연구 보고서 제출
+</button>
+    
 <!-- END PUBLIC REPORT SUBMISSION -->
 
    
@@ -4832,5 +4834,96 @@ function filterMonthlyReports() {
 }
 </script>
 
+async function submitPublicReport() {
+  const title = document.getElementById("newReportTitle").value.trim();
+  const nickname = document.getElementById("newReportNickname").value.trim();
+  const summary = document.getElementById("newReportSummary").value.trim();
+  const overview = document.getElementById("newReportOverview").value.trim();
+  const analysis = document.getElementById("newReportAnalysis").value.trim();
+  const conclusion = document.getElementById("newReportConclusion").value.trim();
+  const sourceUrl = document.getElementById("newReportSource").value.trim();
+  const timestampText = document.getElementById("newReportTimestamp").value.trim();
+
+  if (!title || !nickname) {
+    alert("보고서 제목과 작성자 별명을 입력해 주세요.");
+    return;
+  }
+
+  if (!reportTurnstileToken) {
+    alert("보안 인증을 먼저 완료해 주세요.");
+    return;
+  }
+
+  let timestamp = null;
+
+  if (timestampText) {
+    const match = timestampText.match(/^(\d{2}):([0-5]\d)$/);
+
+    if (!match) {
+      alert("영상 시작 시간은 02:55와 같은 분:초 형식으로 입력해 주세요.");
+      return;
+    }
+
+    timestamp = Number(match[1]) * 60 + Number(match[2]);
+  }
+
+  if (sourceUrl && !sourceUrl.startsWith("https://")) {
+    alert("영상 링크는 HTTPS 주소를 입력해 주세요.");
+    return;
+  }
+
+  const submitButton = document.querySelector(
+    '#publicReportForm button[onclick="submitPublicReport()"]'
+  );
+
+  submitButton.disabled = true;
+  submitButton.textContent = "제출 중...";
+
+  try {
+    const { data, error } =
+      await window.gomgaeSupabase.functions.invoke("submit-report", {
+        body: {
+          turnstile_token: reportTurnstileToken,
+          title,
+          author_nickname: nickname,
+          summary,
+          overview,
+          analysis,
+          conclusion,
+          source_url: sourceUrl,
+          source_timestamp: timestamp
+        }
+      });
+
+    if (error) throw error;
+
+    if (!data || !data.success) {
+      throw new Error(data?.message || "보고서 등록에 실패했습니다.");
+    }
+
+    alert("보고서가 등록되었습니다!\n보고서 번호: " + data.report_code);
+
+    document.getElementById("publicReportForm").reset?.();
+
+  } catch (error) {
+    console.error("보고서 제출 오류:", error);
+    alert(error.message || "보고서 제출 중 오류가 발생했습니다.");
+
+} finally {
+    reportTurnstileToken = "";
+
+    if (
+      window.turnstile &&
+      reportTurnstileWidgetId !== null
+    ) {
+      window.turnstile.reset(reportTurnstileWidgetId);
+    }
+
+    submitButton.disabled = false;
+    submitButton.textContent = "연구 보고서 제출";
+  }
+}
+</script>
+  
 </body>
 </html>
