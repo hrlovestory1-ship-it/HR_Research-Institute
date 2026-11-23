@@ -350,7 +350,7 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
 </aside>
 <main class="main">
 <header class="topbar">
- <div class="top-brand"><button class="mobile-toggle" onclick="toggleMenu()">☰</button><strong>곰개연구소</strong><span>GOMGAE RESEARCH INSTITUTE</span><div class="top-slogan">관계의 모든 순간을 연구하다.</div></div>
+ <div class="top-brand"><button class="mobile-toggle" onclick="toggleMenu()">☰</button><strong>곰개연구소</strong><span>GOMGAE RESEARCH INSTITUTE</span><div class="top-slogan">햄얼 관계의 모든 순간을 연구하다.</div></div>
  <div class="top-actions"><div class="system">SYSTEM STATUS<b>ONLINE · PREVIEW MODE</b></div><button class="access" id="researcherAccessButton" onclick="openLogin()">♙ &nbsp; RESEARCHER ACCESS</button></div>
 </header>
 <div class="content">
@@ -520,8 +520,75 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
  <!-- REPORT LIST -->
  <div id="reportList" class="report-grid">
 
+   
+<!-- REPORT FILTER -->
+<div style="
+  grid-column:1/-1;
+  background:#f1ede5;
+  border:1px solid #c8bfb1;
+  padding:18px;
+  margin-bottom:8px;
+  color:#242321;
+">
+  <div style="
+    font-family:Georgia,serif;
+    font-size:20px;
+    letter-spacing:2px;
+    margin-bottom:5px;
+  ">
+    DOCUMENT ARCHIVE
+  </div>
+
+  <small style="color:#777166;letter-spacing:1px;">
+    RESEARCH REPORT SEARCH SYSTEM
+  </small>
+
+  <div style="
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:10px;
+    margin-top:18px;
+  ">
+
+    <select id="reportYear" onchange="filterMonthlyReports()"
+      style="padding:12px;background:#e9e4da;border:1px solid #c8bfb1;color:#242321;">
+      <option value="all">전체 연도</option>
+      <option value="2026">2026년</option>
+    </select>
+
+    <select id="reportMonth" onchange="filterMonthlyReports()"
+      style="padding:12px;background:#e9e4da;border:1px solid #c8bfb1;color:#242321;">
+      <option value="all">전체 월</option>
+      <option value="01">01월</option>
+      <option value="02">02월</option>
+      <option value="03">03월</option>
+      <option value="04">04월</option>
+      <option value="05">05월</option>
+      <option value="06">06월</option>
+      <option value="07">07월</option>
+      <option value="08">08월</option>
+      <option value="09">09월</option>
+      <option value="10">10월</option>
+      <option value="11">11월</option>
+      <option value="12">12월</option>
+    </select>
+
+    <input
+      id="reportSearch"
+      type="text"
+      placeholder="보고서 제목 또는 번호 검색"
+      oninput="filterMonthlyReports()"
+      style="padding:12px;background:#e9e4da;border:1px solid #c8bfb1;color:#242321;min-width:0;"
+    >
+
+  </div>
+</div>
+
 <!-- OCTOBER -->
-<article class="info-card">
+<article class="info-card"
+ data-year="2026"
+ data-month="10"
+ data-search="REPORT-002 10월 관계성 연구 보고서 등짝 마이크 비정상적으로 가까운 거리">
  <div class="report-cover">
   <small>GOMGAE RESEARCH INSTITUTE</small>
   <b>MONTHLY<br>REPORT</b>
@@ -545,8 +612,11 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
  </button>
 </article>
 
-  <!-- SEPTEMBER -->
-  <article class="info-card">
+<!-- SEPTEMBER -->
+<article class="info-card"
+ data-year="2026"
+ data-month="09"
+ data-search="REPORT-001 9월 관계성 연구 보고서 우리 형 진짜 고생 많이 하고">
    <div class="report-cover">
     <small>GOMGAE RESEARCH INSTITUTE</small>
     <b>MONTHLY<br>REPORT</b>
@@ -4591,6 +4661,42 @@ restoreResearcherAccess().then(() => {
   
 
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileApiLoaded&render=explicit" async defer></script>
+
+  
+<script>
+function filterMonthlyReports() {
+  const year = document.getElementById('reportYear').value;
+  const month = document.getElementById('reportMonth').value;
+  const keyword = document.getElementById('reportSearch').value
+    .trim()
+    .toLowerCase();
+
+  const cards = document.querySelectorAll(
+    '#reportList article.info-card'
+  );
+
+  cards.forEach(card => {
+    const cardYear = card.dataset.year;
+    const cardMonth = card.dataset.month;
+    const searchText = (card.dataset.search || '')
+      .toLowerCase();
+
+    const yearMatch =
+      year === 'all' || cardYear === year;
+
+    const monthMatch =
+      month === 'all' || cardMonth === month;
+
+    const keywordMatch =
+      keyword === '' || searchText.includes(keyword);
+
+    card.style.display =
+      yearMatch && monthMatch && keywordMatch
+        ? ''
+        : 'none';
+  });
+}
+</script>
 
 </body>
 </html>
