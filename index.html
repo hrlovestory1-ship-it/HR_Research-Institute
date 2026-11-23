@@ -4909,7 +4909,8 @@ async function submitPublicReport() {
     console.error("보고서 제출 오류:", error);
     alert(error.message || "보고서 제출 중 오류가 발생했습니다.");
 
-} finally {
+  } finally {
+  
     reportTurnstileToken = "";
 
     if (
