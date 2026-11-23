@@ -5031,29 +5031,6 @@ document.getElementById("newReportConclusion").value = "";
 document.getElementById("newReportSource").value = "";
 document.getElementById("newReportTimestamp").value = "";
 
-clearReportPhotos();
-        body: {
-          turnstile_token: reportTurnstileToken,
-          title,
-          author_nickname: nickname,
-          summary,
-          overview,
-          analysis,
-          conclusion,
-          source_url: sourceUrl,
-          source_timestamp: timestamp
-        }
-      });
-
-    if (error) throw error;
-
-    if (!data || !data.success) {
-      throw new Error(data?.message || "보고서 등록에 실패했습니다.");
-    }
-
-    alert("보고서가 등록되었습니다!\n보고서 번호: " + data.report_code);
-
-    document.getElementById("publicReportForm").reset?.();
 
   } catch (error) {
     console.error("보고서 제출 오류:", error);
@@ -5074,6 +5051,7 @@ clearReportPhotos();
     submitButton.textContent = "연구 보고서 제출";
   }
 }
+  
 </script>
   
 </body>
