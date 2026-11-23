@@ -600,14 +600,19 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
     RESEARCHER CONTRIBUTION / PUBLICATION
   </p>
 
-  <button class="dark-action"
-    type="button"
-    onclick="
-      const form = document.getElementById('publicReportForm');
-      form.style.display = form.style.display === 'none' ? 'block' : 'none';
-    ">
-    + 새 연구 보고서 작성
-  </button>
+<button class="dark-action"
+  type="button"
+  onclick="
+    const form = document.getElementById('publicReportForm');
+    const willOpen = form.style.display === 'none';
+    form.style.display = willOpen ? 'block' : 'none';
+
+    if (willOpen) {
+      renderReportTurnstile();
+    }
+  ">
+  + 새 연구 보고서 작성
+</button>
 
   <div id="publicReportForm" style="display:none;margin-top:20px;">
 
@@ -2213,7 +2218,11 @@ function toggleMenu() {
   
 // Cloudflare Turnstile 인증 토큰 저장
 let researcherTurnstileToken = "";
-
+  
+// 보고서 제출 전용 인증 토큰
+let reportTurnstileToken = "";
+let reportTurnstileWidgetId = null;
+  
 function onTurnstileSuccess(token) {
   researcherTurnstileToken = token;
 }
@@ -2252,6 +2261,35 @@ function renderResearcherTurnstile() {
   });
 }
 
+  
+// 보고서 제출용 Turnstile 위젯 생성
+function renderReportTurnstile() {
+  if (!window.turnstile || reportTurnstileWidgetId !== null) {
+    return;
+  }
+
+  const container = document.getElementById("public-report-turnstile");
+
+  if (!container) return;
+
+  reportTurnstileWidgetId = window.turnstile.render(container, {
+    sitekey: "0x4AAAAAAGKD28lPV1PbIF-6",
+
+    callback: function(token) {
+      reportTurnstileToken = token;
+    },
+
+    "expired-callback": function() {
+      reportTurnstileToken = "";
+    },
+
+    "error-callback": function() {
+      reportTurnstileToken = "";
+    }
+  });
+}
+
+  
 // Turnstile 스크립트 로딩 완료
 function onTurnstileApiLoaded() {
   if (document.getElementById("loginModal").classList.contains("open")) {
