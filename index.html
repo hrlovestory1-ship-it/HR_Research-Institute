@@ -5058,6 +5058,11 @@ function openDynamicReport(report) {
   detail.style.display = "block";
 }
 
+// 페이지 진입 시 검색 필터 초기화
+document.getElementById("reportYear").value = "all";
+document.getElementById("reportMonth").value = "all";
+document.getElementById("reportSearch").value = "";
+  
 // 페이지가 열리면 보고서 목록 자동 불러오기
 loadMonthlyReports();
 
