@@ -646,10 +646,16 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
       placeholder="https://youtu.be/..."
       style="width:100%;padding:12px;margin:7px 0 15px;">
 
-    <label>영상 시작 시간 (초)</label>
-    <input id="newReportTimestamp" type="number" min="0"
-      placeholder="예: 175"
-      style="width:100%;padding:12px;margin:7px 0 15px;">
+<label>영상 시작 시간 (분:초)</label>
+<input
+  id="newReportTimestamp"
+  type="text"
+  inputmode="numeric"
+  maxlength="5"
+  pattern="[0-9]{2}:[0-5][0-9]"
+  placeholder="예: 02:55"
+  title="분:초 형식으로 입력해 주세요. 예: 02:55"
+  style="width:100%;padding:12px;margin:7px 0 15px;">
 
     <label>관련 사진 첨부</label>
     <input id="newReportPhotos" type="file"
