@@ -581,6 +581,16 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
       style="padding:12px;background:#e9e4da;border:1px solid #c8bfb1;color:#242321;min-width:0;"
     >
 
+    <button
+  id="reportArchiveButton"
+  class="dark-action"
+  type="button"
+  onclick="toggleReportArchive()"
+  style="grid-column:1/-1;margin-top:12px;"
+>
+  이전 보고서 보관함 열기 →
+</button>
+    
   </div>
 </div>
 
@@ -4853,6 +4863,38 @@ function filterMonthlyReports() {
         : 'none';
   });
 }
+
+// 이전 보고서 보관함 열기 / 닫기
+function toggleReportArchive() {
+  const currentDate = new Date();
+  const currentYear = String(currentDate.getFullYear());
+  const currentMonth = String(currentDate.getMonth() + 1)
+    .padStart(2, "0");
+
+  const yearSelect = document.getElementById("reportYear");
+  const monthSelect = document.getElementById("reportMonth");
+  const button = document.getElementById("reportArchiveButton");
+
+  const isArchiveOpen = button.dataset.open === "true";
+
+  if (isArchiveOpen) {
+    yearSelect.value = currentYear;
+    monthSelect.value = currentMonth;
+
+    button.dataset.open = "false";
+    button.textContent = "이전 보고서 보관함 열기 →";
+  } else {
+    yearSelect.value = "all";
+    monthSelect.value = "all";
+
+    button.dataset.open = "true";
+    button.textContent = "현재 월 보고서로 돌아가기 ↑";
+  }
+
+  document.getElementById("reportSearch").value = "";
+  filterMonthlyReports();
+}
+  
 </script>
 
 <script>
@@ -5059,11 +5101,17 @@ function openDynamicReport(report) {
   detail.style.display = "block";
 }
 
-// 페이지 진입 시 검색 필터 초기화
-document.getElementById("reportYear").value = "all";
-document.getElementById("reportMonth").value = "all";
+// 페이지 진입 시 현재 연도와 월 자동 설정
+const currentDate = new Date();
+
+document.getElementById("reportYear").value =
+  String(currentDate.getFullYear());
+
+document.getElementById("reportMonth").value =
+  String(currentDate.getMonth() + 1).padStart(2, "0");
+
 document.getElementById("reportSearch").value = "";
-  
+
 // 페이지가 열리면 보고서 목록 자동 불러오기
 loadMonthlyReports();
 
