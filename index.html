@@ -4831,12 +4831,28 @@ restoreResearcherAccess().then(() => {
 
   
 <script>
+
 function filterMonthlyReports() {
   const year = document.getElementById('reportYear').value;
   const month = document.getElementById('reportMonth').value;
   const keyword = document.getElementById('reportSearch').value
     .trim()
     .toLowerCase();
+
+  const archiveButton =
+    document.getElementById('reportArchiveButton');
+
+  const isArchiveOpen =
+    archiveButton.dataset.open === "true";
+
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = String(
+    currentDate.getMonth() + 1
+  ).padStart(2, "0");
+
+  const currentPeriod =
+    Number(`${currentYear}${currentMonth}`);
 
   const cards = document.querySelectorAll(
     '#reportList article.info-card'
@@ -4845,24 +4861,41 @@ function filterMonthlyReports() {
   cards.forEach(card => {
     const cardYear = card.dataset.year;
     const cardMonth = card.dataset.month;
+
+    const cardPeriod =
+      Number(`${cardYear}${cardMonth}`);
+
     const searchText = (card.dataset.search || '')
       .toLowerCase();
-
-    const yearMatch =
-      year === 'all' || cardYear === year;
-
-    const monthMatch =
-      month === 'all' || cardMonth === month;
 
     const keywordMatch =
       keyword === '' || searchText.includes(keyword);
 
+    let periodMatch = false;
+
+    if (isArchiveOpen) {
+      // 보관함에는 현재 월보다 이전 보고서만 표시
+      const yearMatch =
+        year === 'all' || cardYear === year;
+
+      const monthMatch =
+        month === 'all' || cardMonth === month;
+
+      periodMatch =
+        cardPeriod < currentPeriod &&
+        yearMatch &&
+        monthMatch;
+    } else {
+      // 메인 화면에는 현재 월 보고서만 표시
+      periodMatch =
+        cardPeriod === currentPeriod;
+    }
+
     card.style.display =
-      yearMatch && monthMatch && keywordMatch
-        ? ''
-        : 'none';
+      periodMatch && keywordMatch ? '' : 'none';
   });
 }
+
 
 // 이전 보고서 보관함 열기 / 닫기
 function toggleReportArchive() {
