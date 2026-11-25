@@ -628,6 +628,25 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
 
     <label>보고서 제목</label>
     <input id="newReportTitle" type="text" maxlength="120"
+      
+      <!-- REPORT TARGET DATE -->
+<div style="margin-top:16px;">
+  <label for="newReportDate"
+    style="display:block;margin-bottom:8px;">
+    REPORT TARGET DATE / 보고 대상 날짜
+  </label>
+
+  <input
+    type="date"
+    id="newReportDate"
+    required
+    style="width:100%;padding:12px;background:#e9e4da;border:1px solid #c8bfb1;color:#242321;"
+  >
+
+  <small style="display:block;margin-top:6px;color:#777166;">
+    해당 보고서가 다루는 날짜를 선택해 주세요.
+  </small>
+</div>
       placeholder="보고서 제목을 입력해 주세요"
       style="width:100%;padding:12px;margin:7px 0 15px;">
 
@@ -4832,6 +4851,7 @@ restoreResearcherAccess().then(() => {
   
 <script>
 
+
 function filterMonthlyReports() {
   const year = document.getElementById('reportYear').value;
   const month = document.getElementById('reportMonth').value;
@@ -4895,6 +4915,7 @@ function filterMonthlyReports() {
       periodMatch && keywordMatch ? '' : 'none';
   });
 }
+
 
 
 // 이전 보고서 보관함 열기 / 닫기
@@ -5230,6 +5251,7 @@ document.getElementById("newReportPhotos").addEventListener(
   
 async function submitPublicReport() {
   const title = document.getElementById("newReportTitle").value.trim();
+  const reportDate = document.getElementById("newReportDate").value;
   const nickname = document.getElementById("newReportNickname").value.trim();
   const summary = document.getElementById("newReportSummary").value.trim();
   const overview = document.getElementById("newReportOverview").value.trim();
@@ -5243,6 +5265,11 @@ async function submitPublicReport() {
     return;
   }
 
+  if (!reportDate) {
+  alert("보고 대상 날짜를 선택해 주세요.");
+  return;
+}
+  
   if (!reportTurnstileToken) {
     alert("보안 인증을 먼저 완료해 주세요.");
     return;
@@ -5277,6 +5304,7 @@ async function submitPublicReport() {
 const formData = new FormData();
 
 formData.append("turnstile_token", reportTurnstileToken);
+    formData.append("report_date", reportDate);
 formData.append("title", title);
 formData.append("author_nickname", nickname);
 formData.append("summary", summary);
@@ -5322,6 +5350,7 @@ await loadMonthlyReports();
     
 // 입력 내용 초기화
 document.getElementById("newReportTitle").value = "";
+    document.getElementById("newReportDate").value = "";
 document.getElementById("newReportNickname").value = "";
 document.getElementById("newReportSummary").value = "";
 document.getElementById("newReportOverview").value = "";
