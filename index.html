@@ -626,29 +626,30 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
 
   <div id="publicReportForm" style="display:none;margin-top:20px;">
 
-    <label>보고서 제목</label>
-    <input id="newReportTitle" type="text" maxlength="120"
-      
-      <!-- REPORT TARGET DATE -->
-<div style="margin-top:16px;">
-  <label for="newReportDate"
-    style="display:block;margin-bottom:8px;">
-    REPORT TARGET DATE / 보고 대상 날짜
-  </label>
 
-  <input
-    type="date"
-    id="newReportDate"
-    required
-    style="width:100%;padding:12px;background:#e9e4da;border:1px solid #c8bfb1;color:#242321;"
-  >
+<label>보고서 제목</label>
+<input
+  id="newReportTitle"
+  type="text"
+  maxlength="120"
+  placeholder="보고서 제목을 입력해 주세요"
+  style="width:100%;padding:12px;margin:7px 0 15px;"
+>
 
-  <small style="display:block;margin-top:6px;color:#777166;">
-    해당 보고서가 다루는 날짜를 선택해 주세요.
-  </small>
-</div>
-      placeholder="보고서 제목을 입력해 주세요"
-      style="width:100%;padding:12px;margin:7px 0 15px;">
+<!-- REPORT TARGET DATE -->
+<label for="newReportDate">
+  REPORT TARGET DATE / 보고 대상 날짜
+</label>
+<input
+  type="date"
+  id="newReportDate"
+  required
+  style="width:100%;padding:12px;margin:7px 0 5px;background:#e9e4da;border:1px solid #c8bfb1;color:#242321;"
+>
+<small style="display:block;margin-bottom:15px;color:#777166;">
+  해당 보고서가 다루는 날짜를 선택해 주세요.
+</small>
+
 
     <label>작성자 별명</label>
     <input id="newReportNickname" type="text" maxlength="30"
