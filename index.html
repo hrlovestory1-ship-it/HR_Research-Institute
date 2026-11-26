@@ -131,6 +131,137 @@ button,input,textarea,select{font:inherit}button{cursor:pointer}a{color:inherit;
 .board-large{background:#c8b9a4;border:1px solid #b3a28b;padding:20px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .board-large .evidence-tile{min-height:90px}
 .report-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  
+/* MONTHLY REPORT PAGE REDESIGN */
+
+.report-page-layout {
+  display: block;
+}
+
+.report-current-panel,
+.report-submit-panel,
+.report-archive-panel {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: var(--paper2);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.report-current-panel {
+  background: #f1ede5;
+}
+
+.report-period-label {
+  font: 9px var(--mono);
+  color: var(--brown);
+  letter-spacing: 2px;
+}
+
+.report-period-title {
+  font: 600 25px var(--serif);
+  margin: 6px 0;
+}
+
+.report-period-description {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.report-subheading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.report-subheading h3 {
+  font: 600 17px var(--serif);
+}
+
+.report-subheading small {
+  font: 9px var(--mono);
+  color: var(--muted);
+}
+
+.report-search-box {
+  margin-top: 18px;
+  margin-bottom: 16px;
+}
+
+.report-search-box input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--line);
+  background: #e9e4da;
+  color: var(--ink);
+  font-size: 11px;
+}
+
+.report-empty-state {
+  display: none;
+  padding: 25px 15px;
+  border: 1px dashed var(--line);
+  color: var(--muted);
+  text-align: center;
+  font-size: 11px;
+  margin-top: 12px;
+}
+
+.report-archive-filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 15px 0;
+}
+
+.report-archive-filters select {
+  width: 100%;
+  padding: 10px;
+  background: #e9e4da;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 11px;
+}
+
+.report-month-group {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.report-month-heading {
+  grid-column: 1 / -1;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  font: 600 14px var(--serif);
+}
+
+@media (max-width: 760px) {
+  .report-month-group {
+    grid-template-columns: 1fr;
+  }
+}
+.report-month-heading {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  font: 600 14px var(--serif);
+}
+
+@media (max-width: 760px) {
+  .report-current-panel,
+  .report-submit-panel,
+  .report-archive-panel {
+    padding: 14px;
+  }
+
+  .report-period-title {
+    font-size: 21px;
+  }
+}
+
 .conference-banner{background:var(--ink);color:#eee7dc;padding:25px;margin-bottom:15px}.conference-banner small{font:9px var(--mono);color:#b5a999}.conference-banner h3{font:600 24px var(--serif);margin:8px 0}.conference-banner p{font-size:10px;color:#c6bfb3}
 .program{border:1px solid var(--line);background:var(--paper2)}.program-row{display:grid;grid-template-columns:48px 1fr;gap:12px;padding:13px 16px;border-bottom:1px solid var(--line)}.program-row:last-child{border:0}.program-num{font:12px var(--mono);color:var(--brown)}.program-row b{display:block;font:500 12px var(--serif)}.program-row p{font-size:10px;color:var(--muted);margin-top:3px}
 .community-layout{display:grid;grid-template-columns:190px 1fr;gap:12px}.category-list{border:1px solid var(--line);background:var(--paper2);padding:10px}.category-list button{width:100%;border:0;background:transparent;text-align:left;padding:10px;font-size:11px}.category-list button.active{background:var(--ink);color:white}.post-list{border:1px solid var(--line);background:var(--paper2)}.post{padding:13px 15px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:75px 1fr 85px;gap:10px;align-items:center}.post:last-child{border:0}.post .cat{font:8px var(--mono);color:var(--brown)}.post b{font-size:11px;font-weight:500}.post small{font:8px var(--mono);color:var(--muted);text-align:right}
@@ -521,88 +652,49 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
  <div id="reportList" class="report-grid">
 
    
-<!-- REPORT FILTER -->
-<div style="
-  grid-column:1/-1;
-  background:#f1ede5;
-  border:1px solid #c8bfb1;
-  padding:18px;
-  margin-bottom:8px;
-  color:#242321;
-">
-  <div style="
-    font-family:Georgia,serif;
-    font-size:20px;
-    letter-spacing:2px;
-    margin-bottom:5px;
-  ">
-    DOCUMENT ARCHIVE
+
+<!-- CURRENT MONTH REPORT -->
+<div class="report-current-panel"
+     style="grid-column:1/-1;">
+
+  <div class="report-period-label">
+    01 / CURRENT MONTH
   </div>
 
-  <small style="color:#777166;letter-spacing:1px;">
-    RESEARCH REPORT SEARCH SYSTEM
-  </small>
+  <h3 class="report-period-title"
+      id="currentReportTitle">
+    이번 달 연구 보고서
+  </h3>
 
-  <div style="
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-    gap:10px;
-    margin-top:18px;
-  ">
+  <p class="report-period-description">
+    CURRENT MONTHLY RESEARCH RECORDS
+  </p>
 
-    <select id="reportYear" onchange="filterMonthlyReports()"
-      style="padding:12px;background:#e9e4da;border:1px solid #c8bfb1;color:#242321;">
-      <option value="all">전체 연도</option>
-      <option value="2026">2026년</option>
-    </select>
-
-    <select id="reportMonth" onchange="filterMonthlyReports()"
-      style="padding:12px;background:#e9e4da;border:1px solid #c8bfb1;color:#242321;">
-      <option value="all">전체 월</option>
-      <option value="01">01월</option>
-      <option value="02">02월</option>
-      <option value="03">03월</option>
-      <option value="04">04월</option>
-      <option value="05">05월</option>
-      <option value="06">06월</option>
-      <option value="07">07월</option>
-      <option value="08">08월</option>
-      <option value="09">09월</option>
-      <option value="10">10월</option>
-      <option value="11">11월</option>
-      <option value="12">12월</option>
-    </select>
-
+  <div class="report-search-box">
     <input
       id="reportSearch"
       type="text"
-      placeholder="보고서 제목 또는 번호 검색"
+      placeholder="보고서 제목, 연구원 또는 보고서 번호 검색"
       oninput="filterMonthlyReports()"
-      style="padding:12px;background:#e9e4da;border:1px solid #c8bfb1;color:#242321;min-width:0;"
     >
-
-    <button
-  id="reportArchiveButton"
-  class="dark-action"
-  type="button"
-  onclick="toggleReportArchive()"
-  style="grid-column:1/-1;margin-top:12px;"
->
-  이전 보고서 보관함 열기 →
-</button>
-    
   </div>
+
+  <div id="currentReportEmpty"
+       class="report-empty-state">
+    아직 이번 달에 등록된 보고서가 없습니다.
+  </div>
+
 </div>
 
+<div id="currentReportList"
+     class="report-grid">
+</div>
 
 <!-- PUBLIC REPORT SUBMISSION -->
 <div style="
   grid-column:1/-1;
-  border:1px solid #c8bfb1;
-  background:#e9e4da;
-  padding:20px;
-  margin-bottom:12px;
-">
+<div class="report-submit-panel"
+     style="grid-column:1/-1;">
   <div style="font-family:Georgia,serif;font-size:20px;letter-spacing:2px;">
     SUBMIT NEW REPORT
   </div>
@@ -734,7 +826,27 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
 <!-- END PUBLIC REPORT SUBMISSION -->
 </div>
 
-   
+<!-- PREVIOUS REPORT ARCHIVE -->
+<div class="report-archive-panel"
+     style="grid-column:1/-1;">
+
+  <div class="report-period-label">
+    03 / PREVIOUS RECORDS
+  </div>
+
+  <h3 class="report-period-title">
+    이전 연구 보고서 보관함
+  </h3>
+
+  <p class="report-period-description">
+    ARCHIVED MONTHLY RESEARCH RECORDS
+  </p>
+
+  <div class="report-month-group">
+    <div class="report-month-heading">
+      2026년 10월
+    </div>
+  
 <!-- OCTOBER -->
 <article class="info-card"
  data-year="2026"
@@ -763,6 +875,13 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
  </button>
 </article>
 
+      </div>
+
+  <div class="report-month-group">
+    <div class="report-month-heading">
+      2026년 9월
+    </div>
+    
 <!-- SEPTEMBER -->
 <article class="info-card"
  data-year="2026"
@@ -790,6 +909,11 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
 
  </div>
 
+    </div>
+
+</div>
+<!-- END PREVIOUS REPORT ARCHIVE -->
+   
 <!-- DYNAMIC REPORT DETAIL -->
 <div id="dynamicReportDetail" style="display:none;">
 </div>  
@@ -4854,67 +4978,67 @@ restoreResearcherAccess().then(() => {
 
 
 function filterMonthlyReports() {
-  const year = document.getElementById('reportYear').value;
-  const month = document.getElementById('reportMonth').value;
-  const keyword = document.getElementById('reportSearch').value
-    .trim()
-    .toLowerCase();
+  const searchInput = document.getElementById("reportSearch");
 
-  const archiveButton =
-    document.getElementById('reportArchiveButton');
-
-  const isArchiveOpen =
-    archiveButton.dataset.open === "true";
+  const keyword = searchInput
+    ? searchInput.value.trim().toLowerCase()
+    : "";
 
   const currentDate = new Date();
-  const currentYear = currentDate.getFullYear();
+
+  const currentYear = String(currentDate.getFullYear());
   const currentMonth = String(
     currentDate.getMonth() + 1
   ).padStart(2, "0");
 
-  const currentPeriod =
-    Number(`${currentYear}${currentMonth}`);
-
-  const cards = document.querySelectorAll(
-    '#reportList article.info-card'
+  const currentPeriod = Number(
+    `${currentYear}${currentMonth}`
   );
 
+  const cards = document.querySelectorAll(
+    "#reportList article.info-card"
+  );
+
+  let currentCount = 0;
+
   cards.forEach(card => {
-    const cardYear = card.dataset.year;
-    const cardMonth = card.dataset.month;
+    const cardYear = card.dataset.year || "";
+    const cardMonth = card.dataset.month || "";
 
-    const cardPeriod =
-      Number(`${cardYear}${cardMonth}`);
+    const cardPeriod = Number(
+      `${cardYear}${cardMonth}`
+    );
 
-    const searchText = (card.dataset.search || '')
-      .toLowerCase();
+    const searchText = (
+      card.dataset.search || ""
+    ).toLowerCase();
+
+    const isCurrentMonth =
+      cardPeriod === currentPeriod;
 
     const keywordMatch =
-      keyword === '' || searchText.includes(keyword);
+      keyword === "" || searchText.includes(keyword);
 
-    let periodMatch = false;
-
-    if (isArchiveOpen) {
-      // 보관함에는 현재 월보다 이전 보고서만 표시
-      const yearMatch =
-        year === 'all' || cardYear === year;
-
-      const monthMatch =
-        month === 'all' || cardMonth === month;
-
-      periodMatch =
-        cardPeriod < currentPeriod &&
-        yearMatch &&
-        monthMatch;
-    } else {
-      // 메인 화면에는 현재 월 보고서만 표시
-      periodMatch =
-        cardPeriod === currentPeriod;
+    if (isCurrentMonth && keywordMatch) {
+      currentCount++;
     }
 
     card.style.display =
-      periodMatch && keywordMatch ? '' : 'none';
+      keywordMatch ? "" : "none";
   });
+
+  const emptyMessage =
+    document.getElementById("currentReportEmpty");
+
+  if (emptyMessage) {
+    emptyMessage.style.display =
+      currentCount > 0 ? "none" : "block";
+
+    emptyMessage.textContent =
+      keyword && currentCount === 0
+        ? "검색 조건에 맞는 이번 달 보고서가 없습니다."
+        : "아직 이번 달에 등록된 보고서가 없습니다.";
+  }
 }
 
 
@@ -4956,8 +5080,18 @@ function toggleReportArchive() {
 
   
 // Supabase에 저장된 보고서 목록 불러오기
+
 async function loadMonthlyReports() {
-  const reportList = document.getElementById("reportList");
+  const currentReportList =
+    document.getElementById("currentReportList");
+
+  const archivePanel =
+    document.querySelector("#reportList .report-archive-panel");
+
+  if (!currentReportList || !archivePanel) {
+    console.error("보고서 목록 영역을 찾을 수 없습니다.");
+    return;
+  }
 
   const { data, error } = await window.gomgaeSupabase
     .from("monthly_reports")
@@ -4970,17 +5104,33 @@ async function loadMonthlyReports() {
     return;
   }
 
-  // 기존에 불러온 동적 카드가 있다면 제거
-  reportList.querySelectorAll(".dynamic-report-card")
+  // 기존 동적 카드와 동적 월별 그룹 정리
+  document.querySelectorAll(".dynamic-report-card")
     .forEach(card => card.remove());
 
+  archivePanel.querySelectorAll(".dynamic-report-month-group")
+    .forEach(group => group.remove());
+
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = String(
+    now.getMonth() + 1
+  ).padStart(2, "0");
+
+  const monthGroups = new Map();
+
   data.forEach(report => {
+    const year = Number(report.report_year);
+    const month = String(report.report_month).padStart(2, "0");
+
+    const isCurrentMonth =
+      year === currentYear &&
+      month === currentMonth;
+
     const article = document.createElement("article");
     article.className = "info-card dynamic-report-card";
 
-    const month = String(report.report_month).padStart(2, "0");
-
-    article.dataset.year = String(report.report_year);
+    article.dataset.year = String(year);
     article.dataset.month = month;
     article.dataset.search = [
       report.report_code,
@@ -4999,8 +5149,7 @@ async function loadMonthlyReports() {
     coverTitle.innerHTML = "MONTHLY<br>REPORT";
 
     const coverDate = document.createElement("small");
-    coverDate.textContent =
-      `${report.report_year} · ${month}`;
+    coverDate.textContent = `${year} · ${month}`;
 
     cover.append(institute, coverTitle, coverDate);
 
@@ -5011,7 +5160,7 @@ async function loadMonthlyReports() {
     code.textContent = report.report_code;
 
     const date = document.createElement("span");
-    date.textContent = `${report.report_year}-${month}`;
+    date.textContent = `${year}-${month}`;
 
     meta.append(code, date);
 
@@ -5023,12 +5172,14 @@ async function loadMonthlyReports() {
       report.summary || "등록된 연구 요약이 없습니다.";
 
     const author = document.createElement("small");
-    author.textContent = `RESEARCHER / ${report.author_nickname}`;
+    author.textContent =
+      `RESEARCHER / ${report.author_nickname || "익명 연구원"}`;
 
     const button = document.createElement("button");
     button.className = "dark-action";
     button.type = "button";
     button.textContent = "보고서 열람 →";
+
     button.addEventListener("click", () => {
       openDynamicReport(report);
     });
@@ -5042,11 +5193,58 @@ async function loadMonthlyReports() {
       button
     );
 
-    reportList.appendChild(article);
+    if (isCurrentMonth) {
+      currentReportList.appendChild(article);
+    } else {
+      const groupKey = `${year}-${month}`;
+
+      let monthGroup = monthGroups.get(groupKey);
+
+      if (!monthGroup) {
+        const existingGroups =
+          archivePanel.querySelectorAll(".report-month-group");
+
+        monthGroup = Array.from(existingGroups).find(group => {
+          const monthHeading =
+            group.querySelector(".report-month-heading");
+
+          return monthHeading &&
+            monthHeading.textContent.trim() ===
+            `${year}년 ${Number(month)}월`;
+        });
+
+        if (!monthGroup) {
+          monthGroup = document.createElement("div");
+          monthGroup.className =
+            "report-month-group dynamic-report-month-group";
+
+          const monthHeading = document.createElement("div");
+          monthHeading.className = "report-month-heading";
+          monthHeading.textContent =
+            `${year}년 ${Number(month)}월`;
+
+          monthGroup.appendChild(monthHeading);
+          archivePanel.appendChild(monthGroup);
+        }
+
+        monthGroups.set(groupKey, monthGroup);
+      }
+
+      monthGroup.appendChild(article);
+    }
   });
+
+  const currentTitle =
+    document.getElementById("currentReportTitle");
+
+  if (currentTitle) {
+    currentTitle.textContent =
+      `${currentYear}년 ${Number(currentMonth)}월 연구 보고서`;
+  }
 
   filterMonthlyReports();
 }
+
 
   
 // 새 보고서 상세 내용 열람
@@ -5157,15 +5355,12 @@ function openDynamicReport(report) {
 }
 
 // 페이지 진입 시 현재 연도와 월 자동 설정
-const currentDate = new Date();
+const reportSearchInput =
+  document.getElementById("reportSearch");
 
-document.getElementById("reportYear").value =
-  String(currentDate.getFullYear());
-
-document.getElementById("reportMonth").value =
-  String(currentDate.getMonth() + 1).padStart(2, "0");
-
-document.getElementById("reportSearch").value = "";
+if (reportSearchInput) {
+  reportSearchInput.value = "";
+}
 
 // 페이지가 열리면 보고서 목록 자동 불러오기
 loadMonthlyReports();
