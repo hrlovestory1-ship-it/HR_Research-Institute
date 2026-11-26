@@ -417,7 +417,263 @@ footer{padding:20px 18px 24px;color:var(--muted);font:8px var(--mono);display:fl
   line-height: 1.4;
   overflow-wrap: anywhere;
 }
- 
+
+  
+/* =================================
+   MOBILE RESPONSIVE FIX
+   모바일 화면 레이아웃 보정
+================================= */
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.app,
+.main,
+.content,
+.page {
+  min-width: 0;
+  max-width: 100%;
+}
+
+img,
+video,
+iframe {
+  max-width: 100%;
+}
+
+/* 입력창이 화면 밖으로 나가지 않도록 보정 */
+input,
+textarea,
+select,
+button {
+  max-width: 100%;
+}
+
+input,
+textarea,
+select {
+  min-width: 0;
+}
+
+/* 방명록 입력창 */
+#guestbookWritePanel {
+  width: 100%;
+  min-width: 0;
+}
+
+#guestbookNameArea {
+  width: 100%;
+}
+
+#guestbookNameArea > input[type="text"] {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#guestbookWritePanel > label[for="guestbookMessage"] {
+  display: block;
+  margin: 16px 0 6px;
+}
+
+#guestbookMessage {
+  display: block;
+  width: 100%;
+  min-height: 140px;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+#guestbookSubmitButton {
+  width: 100%;
+}
+
+/* 모바일 메뉴 */
+@media (max-width: 760px) {
+  .sidebar {
+    width: min(280px, 85vw);
+    left: -300px;
+    height: 100dvh;
+    overflow-y: auto;
+    z-index: 100;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .nav {
+    overflow-y: auto;
+    max-height: calc(100dvh - 190px);
+  }
+
+  .topbar {
+    width: 100%;
+    gap: 6px;
+  }
+
+  .top-brand {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .top-brand strong {
+    white-space: nowrap;
+    font-size: 15px;
+  }
+
+  .access {
+    white-space: nowrap;
+    font-size: 9px;
+  }
+
+  .content {
+    width: 100%;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  /* 카드와 표의 가로 넘침 방지 */
+  .panel,
+  .profile-card,
+  .info-card,
+  .report-current-panel,
+  .report-submit-panel,
+  .report-archive-panel {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .subject-card,
+  .observation-card,
+  .community-layout,
+  .report-preview {
+    min-width: 0;
+  }
+
+  .post {
+    grid-template-columns: 60px minmax(0, 1fr);
+    gap: 7px;
+    overflow-wrap: anywhere;
+  }
+
+  .post b {
+    overflow-wrap: anywhere;
+  }
+
+  .board-large {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .report-month-group {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .report-month-group > * {
+    min-width: 0;
+  }
+
+  /* 방문자 기록 및 입력 폼 */
+  .profile-card {
+    padding: 15px;
+  }
+
+  .profile-card input,
+  .profile-card textarea,
+  .profile-card select {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .section-head h2 {
+    overflow-wrap: anywhere;
+    font-size: 22px;
+  }
+
+  .section {
+    padding-top: 22px;
+    padding-bottom: 28px;
+  }
+}
+
+/* 작은 휴대전화 화면 */
+@media (max-width: 480px) {
+  .content {
+    padding-left: 9px;
+    padding-right: 9px;
+  }
+
+  .topbar {
+    padding-left: 9px;
+    padding-right: 9px;
+  }
+
+  .top-brand {
+    gap: 6px;
+  }
+
+  .top-brand strong {
+    font-size: 14px;
+  }
+
+  .mobile-toggle {
+    padding: 6px 8px;
+  }
+
+  .access {
+    padding: 7px 8px;
+    font-size: 8px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .area-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .subject-card {
+    grid-template-columns: 90px minmax(0, 1fr);
+  }
+
+  .subject-details {
+    padding: 11px;
+  }
+
+  .subject-details h3 {
+    font-size: 15px;
+  }
+
+  .board-large {
+    gap: 7px;
+    padding: 10px;
+  }
+
+  .calendar-navigation {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .calendar-navigation button {
+    white-space: normal;
+    font-size: 10px;
+  }
+
+  .form-preview {
+    width: 100%;
+    padding: 12px;
+  }
+
+  footer {
+    overflow-wrap: anywhere;
+  }
+}
+
+  
 </style>
 </head>
 <body>
