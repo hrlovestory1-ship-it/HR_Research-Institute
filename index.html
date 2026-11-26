@@ -674,6 +674,288 @@ select {
 }
 
   
+/* =================================
+   MOBILE CLEAN DESIGN UPDATE
+================================= */
+
+@media (max-width: 760px) {
+
+  /* 입력창 안내 문구 크기 */
+  input::placeholder,
+  textarea::placeholder {
+    font-size: 14px;
+    line-height: 1.5;
+    opacity: 0.72;
+  }
+
+  input,
+  textarea,
+  select {
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  /* 달력 크기와 비율 */
+  #researchCalendar {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-auto-rows: 88px;
+    gap: 3px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  #researchCalendar > * {
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  #researchCalendar .calendar-weekday {
+    min-height: 34px;
+    padding: 7px 1px;
+    font-size: 12px;
+  }
+
+  #researchCalendar .calendar-day {
+    height: 88px;
+    min-height: 0;
+    padding: 5px 3px;
+    overflow: hidden;
+    display: block;
+  }
+
+  #researchCalendar .calendar-day-number {
+    margin: 3px 0 6px;
+    font-size: 15px;
+  }
+
+  #researchCalendar .calendar-event-title {
+    display: -webkit-box;
+    width: 100%;
+    max-width: 100%;
+    padding: 3px 2px;
+    margin-top: 3px;
+    box-sizing: border-box;
+    font-size: 9px;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+
+  /* 게시글 카드 비율 */
+  #communityPostList .profile-card {
+    padding: 15px;
+    margin-bottom: 14px !important;
+    overflow-wrap: anywhere;
+  }
+
+  #communityPostList .profile-card h3 {
+    font-size: 19px;
+    line-height: 1.5;
+    margin-top: 12px;
+  }
+
+  #communityPostList .profile-card p {
+    font-size: 14px;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+  }
+
+  #communityPostList .community-reactions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 14px;
+    margin-bottom: 14px;
+  }
+
+  #communityPostList .community-reactions button {
+    margin: 0 !important;
+    padding: 6px 9px;
+    font-size: 15px;
+    min-width: 0;
+  }
+
+  #communityPostList .community-comments {
+    margin-top: 16px !important;
+  }
+
+  #communityPostList .community-comment-list > div {
+    padding: 12px !important;
+    margin-top: 10px !important;
+    overflow-wrap: anywhere;
+  }
+
+  #communityPostList .community-comment-list p {
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  #communityPostList .community-comment-list textarea,
+  #communityPostList .community-comments > textarea {
+    display: block;
+    width: 100%;
+    min-height: 90px;
+    box-sizing: border-box;
+    font-size: 14px;
+  }
+
+  /* 댓글 버튼 정렬 */
+  #communityPostList .community-comment-list button {
+    width: auto;
+    min-height: 34px;
+    padding: 7px 12px;
+    margin: 0 5px 0 0 !important;
+    font-size: 12px;
+  }
+
+  /* 게시글 상단 관리 버튼 */
+  #communityPostList .profile-card > button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    min-height: 34px;
+    padding: 6px 10px;
+    margin: 8px 5px 0 0 !important;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  #researchCalendar {
+    grid-auto-rows: 78px;
+    gap: 2px;
+  }
+
+  #researchCalendar .calendar-day {
+    height: 78px;
+    padding: 4px 2px;
+  }
+
+  #researchCalendar .calendar-day-number {
+    font-size: 14px;
+  }
+
+  #researchCalendar .calendar-event-title {
+    font-size: 8px;
+  }
+
+  #communityPostList .profile-card {
+    padding: 12px;
+  }
+
+  #communityPostList .community-comment-list button {
+    padding: 6px 9px;
+    font-size: 11px;
+  }
+}
+
+  
+/* 댓글 버튼 한 줄 정렬 */
+.community-comment-actions {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.community-comment-actions .community-comment-action-button {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+  min-height: 36px;
+  padding: 7px 4px;
+  margin: 0 !important;
+  font-size: 12px;
+  white-space: nowrap;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* 답글 버튼도 동일한 크기로 */
+.community-comment-list .community-comment-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+  
+/* 달력 모바일 최종 보정 */
+@media (max-width: 760px) {
+  #researchCalendar {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-template-rows: 34px repeat(6, 78px);
+    grid-auto-rows: 78px;
+    gap: 3px;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  #researchCalendar .calendar-weekday {
+    height: 34px;
+    min-height: 0;
+    padding: 8px 0;
+    font-size: 12px;
+    box-sizing: border-box;
+  }
+
+  #researchCalendar .calendar-day {
+    height: 78px;
+    min-height: 0;
+    padding: 5px 3px;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  #researchCalendar .calendar-day-number {
+    display: block;
+    margin: 2px 0 5px;
+    font-size: 14px;
+    line-height: 1.2;
+  }
+
+  #researchCalendar .calendar-event-title {
+    display: -webkit-box;
+    width: 100%;
+    max-height: 25px;
+    margin-top: 3px;
+    padding: 2px;
+    font-size: 8px;
+    line-height: 1.3;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+}
+
+/* 게시글 상단 관리 버튼 */
+.community-pin-button,
+.community-edit-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-height: 32px;
+  padding: 5px 10px;
+  margin: 8px 5px 0 0;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.community-pin-button {
+  min-width: 34px;
+}
+
 </style>
 </head>
 <body>
@@ -4547,14 +4829,13 @@ editCommunityComment(reply.id, reply.content);
 replies.appendChild(replyItem);
         });
 
-item.append(
-  author,
-  date,
-  content,
-  replyButton,
-  replyArea,
-  replies
-);
+
+// 댓글 버튼 정렬 영역
+const actions = document.createElement("div");
+actions.className = "community-comment-actions";
+
+replyButton.className = "dark-action community-comment-action-button";
+actions.appendChild(replyButton);
 
 // 본인 댓글 또는 운영자에게만 수정·삭제 버튼 표시
 if (
@@ -4564,29 +4845,35 @@ if (
     currentResearcher.is_operator
   )
 ) {
-  const actions = document.createElement("div");
-  actions.style.marginTop = "8px";
-
   const editButton = document.createElement("button");
   editButton.textContent = "수정";
-  editButton.className = "dark-action";
+  editButton.className = "dark-action community-comment-action-button";
 
   editButton.addEventListener("click", () => {
-editCommunityComment(comment.id, comment.content);
+    editCommunityComment(comment.id, comment.content);
   });
 
   const deleteButton = document.createElement("button");
   deleteButton.textContent = "삭제";
-  deleteButton.className = "dark-action";
-  deleteButton.style.marginLeft = "6px";
+  deleteButton.className = "dark-action community-comment-action-button";
 
   deleteButton.addEventListener("click", () => {
     deleteCommunityComment(comment.id);
   });
 
   actions.append(editButton, deleteButton);
-  item.appendChild(actions);
 }
+
+// 댓글 내용과 버튼 표시
+item.append(
+  author,
+  date,
+  content,
+  actions,
+  replyArea,
+  replies
+);
+
 
 list.appendChild(item);
     });
@@ -4991,21 +5278,38 @@ category.textContent = post.category;
       content.style.whiteSpace = "pre-wrap";
       content.style.marginTop = "10px";
 
-     // 게시글 고정 버튼
+
+// 게시글 고정 버튼
 if (isOperator) {
   const pinButton = document.createElement("button");
   pinButton.type = "button";
-  pinButton.textContent = post.is_pinned
-    ? "📌 고정 해제"
-    : "📌 상단 고정";
-
-  pinButton.style.marginTop = "12px";
+  pinButton.textContent = "📌";
+  pinButton.title = post.is_pinned ? "고정 해제" : "상단 고정";
+  pinButton.className = "community-pin-button";
 
   pinButton.addEventListener("click", () => {
     toggleCommunityPin(post.id, post.is_pinned);
   });
 
   card.appendChild(pinButton);
+}
+
+// 게시글 수정 버튼
+if (
+  isOperator ||
+  operatorResearcher?.researcher_number === post.researcher_number
+) {
+  const editButton = document.createElement("button");
+  editButton.type = "button";
+  editButton.textContent = "✏️ 수정";
+  editButton.title = "게시글 수정";
+  editButton.className = "community-edit-button";
+
+  editButton.addEventListener("click", () => {
+    editCommunityPost(post.id, post.title, post.content);
+  });
+
+  card.appendChild(editButton);
 }
 
      // 게시글 수정 버튼
