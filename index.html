@@ -2761,7 +2761,7 @@ async function loadResearchEvents() {
 
     if (adminPanel) {
       adminPanel.style.display =
-        researcher?.role === "ADMIN" ? "block" : "none";
+        (researcher?.role === "ADMIN" || researcher?.role === "SUPER_ADMIN") ? "block" : "none";
     }
 
     renderResearchCalendar();
@@ -2864,7 +2864,9 @@ async function renderResearchEventList() {
 
   try {
     const researcher = await loadResearcherProfile();
-    isAdmin = researcher.role === "ADMIN";
+isAdmin =
+  researcher.role === "ADMIN" ||
+  researcher.role === "SUPER_ADMIN";
   } catch (error) {
     isAdmin = false;
   }
@@ -2940,9 +2942,12 @@ async function deleteResearchEvent(eventId) {
   try {
     const researcher = await loadResearcherProfile();
 
-    if (researcher.role !== "ADMIN") {
-      throw new Error("관리자만 일정을 삭제할 수 있습니다.");
-    }
+if (
+  researcher.role !== "ADMIN" &&
+  researcher.role !== "SUPER_ADMIN"
+) {
+  throw new Error("관리자만 일정을 삭제할 수 있습니다.");
+}
 
     const { error } = await window.gomgaeSupabase
       .from("research_events")
@@ -2975,7 +2980,7 @@ async function createResearchEvent() {
   try {
     const researcher = await loadResearcherProfile();
 
-    if (researcher.role !== "ADMIN") {
+    if (researcher.role !== "ADMIN" && researcher.role !== "SUPER_ADMIN") {
       throw new Error("관리자만 일정을 등록할 수 있습니다.");
     }
 
